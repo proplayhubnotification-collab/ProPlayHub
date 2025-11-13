@@ -122,3 +122,27 @@ function togglePasswordVisibility() {
         toggleIcon.className = 'fas fa-eye cursor-pointer text-slate-600 dark:text-slate-300';
     }
 }
+
+async function Login(username, password) {
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showToast('Login successful! Redirecting...', 'success');
+            // window.location.href = '/dashboard';
+        } else {
+            showToast(data.message || 'Invalid username or password', 'error');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        showToast('An unexpected error occurred', 'error');
+    }
+}
