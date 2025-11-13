@@ -1,0 +1,59 @@
+<!-- Design prototype is optimized for Google Pixel 7. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Welcome back ProPlayHub</title>
+    <link rel="icon" href="../../asset/icon/favicon.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+    <script>
+      tailwind.config = {
+        darkMode: 'media', // hoặc 'class'
+      }
+    </script>
+    <!-- Gắn javascript nếu cần thiết -->
+    <!-- <script src="js/index.js"></script> -->
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        .toast-slide-in {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        .toast-slide-out {
+            animation: slideOut 0.3s ease-in forwards;
+        }
+    </style>
+</head>
+<body>
+    <main class="w-[412px] h-[915px] mx-auto bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300">
+    <!-- Toast Alert Container -->
+        <div id="toast-container" class="fixed top-4 right-4 text-sm z-50">
+
+        </div>
+
+        <!-- Bắt đầu code từ chỗ này (Không sửa template này để có sự nhất quán) -->
+        <!-- tạo trang để có thể thêm thẻ tín dụng khi thanh toán -->
+
+    </main>
+</body>
+</html>
