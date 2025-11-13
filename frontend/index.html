@@ -7,12 +7,13 @@
     <title>Welcome back ProPlayHub</title>
     <link rel="icon" href="asset/icon/favicon.png" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
     <script>
       tailwind.config = {
         darkMode: 'media', // hoặc 'class'
       }
     </script>
-    <script src="js/validateForm.js"></script>
+    <script src="js/index.js"></script>
     <style>
         @keyframes slideIn {
             from {
@@ -69,25 +70,32 @@
                 <form aria-label="Login form" onsubmit="event.preventDefault(); handleLogin();">
                     <div class="flex flex-col gap-3 px-8">
                         <div class="mb-4">
-                            <label for="username" class="block text-sm font-medium mb-1">Username</label>
-                            <input type="text" id="username" name="username" 
-                                aria-label="Enter your username"
-                                class="w-full text-sm text-slate-950 dark:text-slate-50 bg-transparent border-b-2 border-rose-500 focus:outline-none focus:border-b-2 focus:border-rose-600 transition-all duration-200 h-10 font-semibold"
-                                placeholder="Enter your username"
-                            >
+                            <label for="username" class="block text-base font-medium mb-1">Username</label>
+                            <div id="username-container" class="flex items-center gap-2 border-b-2 border-slate-300 dark:border-slate-700 focus-within:border-rose-600 transition-all duration-200">
+                                <input type="text" id="username" name="username" 
+                                    aria-label="Enter your username"
+                                    class="w-full text-sm text-slate-950 dark:text-slate-50 bg-transparent focus:outline-none h-10 font-semibold"
+                                    placeholder="Enter your username"
+                                >
+                            </div>
                         </div>
                         <div class="mb-6">
                             <div>
                                 <div class="flex justify-between items-center mb-1">
-                                    <label for="password" class="block text-sm font-medium">Password</label>
+                                    <label for="password" class="block text-base font-medium">Password</label>
                                     <a aria-label="Forgot Password?" href="#" class="text-sm text-rose-600 hover:underline font-medium">Forgot Password?</a>
                                 </div>
                             </div>
-                            <input type="password" id="password" name="password" 
-                                class="w-full text-sm text-slate-950 dark:text-slate-50 bg-transparent border-b-2 border-rose-500 focus:outline-none focus:border-b-2 focus:border-rose-600 transition-all duration-200 h-10 font-semibold"
-                                placeholder="••••••"
-                                aria-label="Enter your password"
-                            >
+                            <div id="password-container" class="flex items-center gap-2 border-b-2 border-slate-300 dark:border-slate-700 focus-within:border-rose-600 transition-all duration-200">
+                                <input type="password" id="password" name="password"
+                                        class="w-full text-sm text-slate-950 dark:text-slate-50 bg-transparent focus:outline-none h-10 font-semibold"
+                                        placeholder="••••••"
+                                        aria-label="Enter your password">
+                                <div class="cursor-pointer text-slate-500"
+                                    onclick="togglePasswordVisibility()">
+                                    <i class="fa-solid fa-eye"></i>
+                                </div>
+                            </div>
                         </div>
                         <div class="flex flex-col">
                             <button type="submit"
@@ -133,8 +141,6 @@
                     </span>
                 </button>
             </div>
-
-
         </div>
     </main>
 </body>

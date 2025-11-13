@@ -58,30 +58,18 @@ function showToast(message, type = 'info', duration = 3000) {
     }, duration);
 }
 
-function validateForm(form) {
-    let isValid = true;
-    const inputs = form.querySelectorAll('input, textarea, select');
-
-    inputs.forEach(input => {
-        if (!input.value.trim()) {
-            isValid = false;
-            input.classList.add('error');
-        } else {
-            input.classList.remove('error');
-        }
-    });
-
-    return isValid; 
-}
 // Handle login form submission
 function handleLogin() {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
     
     // Validate inputs
     if (!username && !password) {
         if (tryCount < 3) {
             showToast('Please enter username and password', 'error');
+            usernameInput.focus();
             tryCount += 1;
         }
         return;
@@ -90,6 +78,7 @@ function handleLogin() {
     if (!username) {
         if (tryCount < 3) {
             showToast('Please enter your username', 'error');
+            usernameInput.focus();
             tryCount += 1;
         }
         return;
@@ -98,6 +87,7 @@ function handleLogin() {
     if (!password) {
         if (tryCount < 3) {
             showToast('Please enter your password', 'error');
+            passwordInput.focus();
             tryCount += 1;
         }
         return;
@@ -119,10 +109,16 @@ function handleLogin() {
     }, 2000);
 }
 
-// Test toast on page load (optional - remove in production)
-window.addEventListener('DOMContentLoaded', () => {
-    // Uncomment to test toast on page load
-    // setTimeout(() => {
-    //     showToast('Welcome to ProPlayHub!', 'success', 4000);
-    // }, 500);
-});
+function togglePasswordVisibility() {
+    const passwordContainer = document.getElementById('password-container');    
+    const passwordInput = passwordContainer.querySelector('input');
+    const toggleIcon = passwordContainer.querySelector('i');
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.className = 'fas fa-eye-slash cursor-pointer text-slate-600 dark:text-slate-300';
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.className = 'fas fa-eye cursor-pointer text-slate-600 dark:text-slate-300';
+    }
+}
