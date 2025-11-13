@@ -1,20 +1,141 @@
+<!-- Design prototype is optimized for Google Pixel 7. -->
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Welcome back ProPlayHub</title>
-    <link rel="icon" href="asset/img/favicon.png" />
+    <link rel="icon" href="asset/icon/favicon.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         darkMode: 'media', // hoặc 'class'
       }
     </script>
+    <script src="js/validateForm.js"></script>
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        .toast-slide-in {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        .toast-slide-out {
+            animation: slideOut 0.3s ease-in forwards;
+        }
+    </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center bg-white text-black dark:bg-gray-900 dark:text-white transition-colors duration-300">
-    <div>
-        
-    </div>
+<body>
+    <main class="w-[412px] h-[915px] mx-auto bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300">
+    <!-- Toast Alert Container -->
+        <div id="toast-container" class="fixed top-4 right-4 text-sm z-50">
+
+        </div>
+        <div class="overflow-hidden">
+            <!-- Header -->
+            <div class="flex flex-col gap-2 items-center justify-center mt-[5rem] mb-6 px-4">
+                <img src="asset/icon/logo.png" alt="ProPlayHub Logo" 
+                    class="w-[8rem] h-[8rem] mx-auto filter drop-shadow-[0_0_30px_rgba(247,42,49,0.9)]"
+                    aria-label="ProPlayHub Logo"
+                >
+                <h1 aria-label="Welcome back" 
+                    class="text-3xl font-bold mb-2 text-center">
+                    Welcome back
+                </h1>
+                <p aria-label="Login to your ProPlay Hub account to discover more offers" 
+                    class="text-center text-slate-600 dark:text-slate-400 mb-6 text-balance">
+                    Login to your <strong>ProPlay Hub</strong> account to discover more offers
+                </p>
+            </div>
+            <!-- Login Form -->
+            <div class="flex flex-col gap-2 mb-4">
+                <form aria-label="Login form" onsubmit="event.preventDefault(); handleLogin();">
+                    <div class="flex flex-col gap-3 px-8">
+                        <div class="mb-4">
+                            <label for="username" class="block text-sm font-medium mb-1">Username</label>
+                            <input type="text" id="username" name="username" 
+                                aria-label="Enter your username"
+                                class="w-full text-sm text-slate-950 dark:text-slate-50 bg-transparent border-b-2 border-rose-500 focus:outline-none focus:border-b-2 focus:border-rose-600 transition-all duration-200 h-10 font-semibold"
+                                placeholder="Enter your username"
+                            >
+                        </div>
+                        <div class="mb-6">
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label for="password" class="block text-sm font-medium">Password</label>
+                                    <a aria-label="Forgot Password?" href="#" class="text-sm text-rose-600 hover:underline font-medium">Forgot Password?</a>
+                                </div>
+                            </div>
+                            <input type="password" id="password" name="password" 
+                                class="w-full text-sm text-slate-950 dark:text-slate-50 bg-transparent border-b-2 border-rose-500 focus:outline-none focus:border-b-2 focus:border-rose-600 transition-all duration-200 h-10 font-semibold"
+                                placeholder="••••••"
+                                aria-label="Enter your password"
+                            >
+                        </div>
+                        <div class="flex flex-col">
+                            <button type="submit"
+                                aria-label="Login to your account"
+                                class="w-full bg-rose-600 text-white py-2 rounded-md hover:bg-rose-700 text-md font-bold transition-colors duration-200"
+                            >
+                                Login
+                            </button>
+
+                            <div aria-label="Sign Up prompt"
+                                class="text-center text-sm text-slate-600 dark:text-slate-400 mt-4">
+                                You don't have an account?
+                                <a aria-label="Sign Up" href="#" class="text-rose-600 hover:underline font-medium">Sign Up</a>  
+                                now!
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div aria-label="or Sign In with" class="flex gap-4 text-center items-center justify-center mt-8 px-8">
+                <div class="border border-slate-300 dark:border-slate-700 w-full"></div>
+                <div class="text-sm text-slate-500 dark:text-slate-400 font-medium w-full">or Sign In with</div>
+                <div class="border border-slate-300 dark:border-slate-700 w-full"></div>
+            </div>
+            <!-- SSO Method -->
+
+            <div class="flex flex-col gap-3 items-center justify-center mt-8 px-16">
+                <button class="w-full bg-slate-50 py-2 rounded-md text-md font-medium transition-colors duration-200 border border-slate-300 dark:border-none">
+                    <img src="asset/icon/google-icon.png" alt="Sign in with Google" 
+                        class="w-6 h-6 inline-block mr-2 align-middle"
+                    >
+                    <span class="align-middle font-medium text-sm text-slate-950">
+                        Sign in with Google
+                    </span>
+                </button>
+                <button class="w-full bg-slate-50 py-2 rounded-md text-md font-medium transition-colors duration-200 border border-slate-300 dark:border-none">
+                    <img src="asset/icon/github-icon.png" alt="Sign in with Github" 
+                        class="w-6 h-6 inline-block mr-2 align-middle"
+                    >
+                    <span class="align-middle font-medium text-sm text-slate-950">
+                        Sign in with Github
+                    </span>
+                </button>
+            </div>
+
+
+        </div>
+    </main>
 </body>
 </html>
