@@ -1,5 +1,4 @@
-<!-- File: customer-view.html -->
-<!-- IMPORTANT: Only content inside <main> was added — the rest of the original template remains unchanged -->
+<!-- Design prototype is optimized for Google Pixel 7. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <!-- Tên và mô tả ứng dụng -->
     <meta name="application-name" content="ProPlay Hub">
-    <meta name="description" content="Short description of your app">
+    <meta name="description" content="Mô tả ngắn gọn về ứng dụng của bạn">
 
     <!-- Màu chủ đạo khi hiển thị (thanh status, taskbar, v.v.) -->
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc">
@@ -74,196 +73,9 @@
 
         </div>
 
-        <!-- Start code here (Do not change outer template) -->
-        <!-- Customer View Page - Mobile-first (Pixel 7) -->
+        <!-- Bắt đầu code từ chỗ này (Không sửa template này để có sự nhất quán) -->
         
-        <!-- Page-specific styles -->
-        <style>
-            :root{
-                --primary: #ec003f;
-                --light-bg: #f8fafc;
-                --light-text: #020618;
-                --dark-bg: #020618;
-                --dark-text: #f8fafc;
-                --radius: 0.375rem;
-                --card-light: #ffffff;
-                --card-dark: #1a1a1a;
-            }
 
-            .pph-mobile {
-                max-width: 430px;
-                margin: 0 auto;
-                min-height: 100vh;
-                background: var(--light-bg);
-                color: var(--light-text);
-                font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-                padding-bottom: 90px;
-            }
-            @media (prefers-color-scheme: dark) {
-                .pph-mobile { background: var(--dark-bg); color: var(--dark-text); }
-            }
-
-            .pph-topbar {
-                display:flex;
-                align-items:center;
-                gap:12px;
-                padding:16px 18px;
-                position: sticky;
-                top:0;
-                background: transparent;
-                z-index: 10;
-            }
-            .pph-back { font-size:20px; cursor:pointer; color:var(--primary); }
-            .pph-title { font-weight:700; color:var(--primary); font-size:18px; }
-
-            .pph-customer-header {
-                display:flex;
-                gap:12px;
-                align-items:center;
-                padding:18px;
-            }
-            .pph-avatar {
-                width:60px;height:60px;border-radius:999px;background:#e6e6e6;flex-shrink:0;
-            }
-            .pph-custname { font-weight:700; font-size:16px; }
-            .pph-custid { font-size:13px; opacity:0.65; }
-
-            .pph-card {
-                margin: 12px 16px;
-                background: var(--card-light);
-                border-radius: var(--radius);
-                padding: 14px;
-                box-shadow: 0 6px 18px rgba(2,6,23,0.06);
-            }
-            @media (prefers-color-scheme: dark) {
-                .pph-card { background: var(--card-dark); box-shadow: 0 6px 18px rgba(0,0,0,0.35); }
-            }
-            .pph-section-title { color:var(--primary); font-weight:700; margin-bottom:8px; }
-
-            .pph-row { display:flex; justify-content:space-between; margin:8px 0; font-size:14px; }
-            .pph-label { opacity:0.75; }
-
-            .pph-badge {
-                display:inline-block;
-                padding:6px 10px;
-                background:var(--primary);
-                color:white;
-                border-radius:var(--radius);
-                font-weight:700;
-                font-size:13px;
-            }
-
-            .pph-log { padding:12px 0; border-bottom:1px solid rgba(2,6,23,0.06); }
-            @media (prefers-color-scheme: dark) {
-                .pph-log { border-color: rgba(255,255,255,0.06); }
-            }
-            .pph-log-title { font-weight:700; }
-            .pph-log-time { font-size:12px; opacity:.65; margin-top:6px; }
-
-            .pph-actions { padding: 16px; display:flex; flex-direction:column; gap:10px; }
-            .pph-btn { padding:13px; border-radius:var(--radius); font-weight:700; border:none; cursor:pointer; font-size:15px; }
-            .pph-btn-primary { background:var(--primary); color:white; }
-            .pph-btn-outline { background:transparent; color:var(--primary); border:1px solid var(--primary); }
-
-            @media (min-width:640px) {
-                .pph-mobile { box-shadow: 0 12px 40px rgba(2,6,23,0.06); border-radius:12px; margin-top:18px; overflow:hidden; }
-            }
-        </style>
-
-        <div class="pph-mobile">
-            <!-- Top bar -->
-            <div class="pph-topbar">
-                <div class="pph-back" onclick="history.back()">←</div>
-                <div class="pph-title">Customer Profile</div>
-            </div>
-
-            <!-- Customer header -->
-            <div class="pph-customer-header">
-                <div class="pph-avatar" id="custAvatar"></div>
-                <div>
-                    <div class="pph-custname" id="custName">Alex Johnson</div>
-                    <div class="pph-custid" id="custId">User ID: #44281</div>
-                </div>
-            </div>
-
-            <!-- Account Information -->
-            <div class="pph-card" aria-labelledby="account-info">
-                <div class="pph-section-title" id="account-info">Account Information</div>
-
-                <div class="pph-row">
-                    <div class="pph-label">Email</div>
-                    <div id="custEmail">alex.johnson@example.com</div>
-                </div>
-
-                <div class="pph-row">
-                    <div class="pph-label">Phone</div>
-                    <div id="custPhone">+1 555 789 4321</div>
-                </div>
-
-                <div class="pph-row">
-                    <div class="pph-label">Joined</div>
-                    <div id="custJoined">Jan 14, 2024</div>
-                </div>
-            </div>
-
-            <!-- Subscription -->
-            <div class="pph-card" aria-labelledby="subscription">
-                <div class="pph-section-title" id="subscription">Subscription</div>
-
-                <div class="pph-row">
-                    <div class="pph-label">Status</div>
-                    <div><span class="pph-badge" id="custStatus">PRO+ Active</span></div>
-                </div>
-
-                <div class="pph-row">
-                    <div class="pph-label">Valid Until</div>
-                    <div id="custValid">Dec 12, 2025</div>
-                </div>
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="pph-card" aria-labelledby="recent-activity">
-                <div class="pph-section-title" id="recent-activity">Recent Activity</div>
-
-                <div class="pph-log">
-                    <div class="pph-log-title">Logged in</div>
-                    <div class="pph-log-time">Today 09:42 AM</div>
-                </div>
-
-                <div class="pph-log">
-                    <div class="pph-log-title">Updated payment method</div>
-                    <div class="pph-log-time">Yesterday 04:14 PM</div>
-                </div>
-
-                <div class="pph-log">
-                    <div class="pph-log-title">Viewed cloud game settings</div>
-                    <div class="pph-log-time">Yesterday 01:55 PM</div>
-                </div>
-            </div>
-
-            <!-- Actions for CSR -->
-            <div class="pph-actions">
-                <button class="pph-btn pph-btn-primary" id="openChatBtn">Open Live Chat</button>
-                <button class="pph-btn pph-btn-outline" id="suspendBtn">Suspend Account</button>
-            </div>
-        </div>
-
-        <script>
-            // Small JS to wire actions
-            document.getElementById('openChatBtn').addEventListener('click', function(){
-                alert('Opening Live Chat with Alex Johnson (demo).');
-            });
-
-            document.getElementById('suspendBtn').addEventListener('click', function(){
-                if (confirm('Are you sure you want to suspend this account?')) {
-                    alert('Account has been suspended (demo).');
-                    document.getElementById('custStatus').textContent = 'Suspended';
-                    document.getElementById('custStatus').style.background = '#666';
-                }
-            });
-        </script>
-
-        <!-- End of page-specific code -->
     </main>
 </body>
 </html>
