@@ -4,78 +4,351 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <!-- Tên và mô tả ứng dụng -->
     <meta name="application-name" content="ProPlay Hub">
-    <meta name="description" content="Mô tả ngắn gọn về ứng dụng của bạn">
-
-    <!-- Màu chủ đạo khi hiển thị (thanh status, taskbar, v.v.) -->
+    <meta name="description" content="ProPlay Hub - Loyalty & Rewards App">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020618">
 
-    <!-- Khai báo manifest -->
     <link rel="manifest" href="/manifest.json">
-
-    <!-- Icon (cho Android, Chrome, Safari,...) -->
     <link rel="icon" sizes="192x192" href="/icons/icon-192x192.png">
     <link rel="apple-touch-icon" href="/icons/icon-512x512.png">
-
-    <!-- Cấu hình riêng cho iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="ProPlay Hub">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-
-    <!-- Cấu hình cho Windows -->
     <meta name="msapplication-TileColor" content="#020618">
+    
     <title>Welcome back ProPlayHub</title>
-    <link rel="icon" href="../../asset/icon/favicon.png" />
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Serif font for card -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+
     <script>
       tailwind.config = {
-        darkMode: 'media', // hoặc 'class'
+        darkMode: 'class',
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['"Be Vietnam Pro"', 'sans-serif'],
+                    serif: ['"Cinzel"', 'serif'],
+                },
+                colors: {
+                    brand: '#ec003f',
+                    slate: {
+                        50: '#f8fafc',
+                        950: '#020618',
+                    }
+                },
+                borderRadius: {
+                    DEFAULT: '0.375rem',
+                    'card': '1rem' 
+                },
+                boxShadow: {
+                    'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    'glow': '0 0 15px rgba(236, 0, 63, 0.3)',
+                    'metallic': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.4)'
+                }
+            }
+        }
       }
     </script>
-    <!-- Gắn javascript nếu cần thiết -->
-    <!-- <script src="js/index.js"></script> -->
+    
     <style>
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        /* Toast Animation */
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        .toast-slide-in { animation: slideIn 0.3s ease-out forwards; }
+        .toast-slide-out { animation: slideOut 0.3s ease-in forwards; }
+
+        /* METALLIC CARD STYLES */
+        @keyframes shine {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
         }
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
         }
-        .toast-slide-in {
-            animation: slideIn 0.3s ease-out forwards;
+
+        .metallic-card {
+            position: relative;
+            overflow: hidden;
+            background-size: 200% auto;
+            transition: all 0.3s ease;
         }
-        .toast-slide-out {
-            animation: slideOut 0.3s ease-in forwards;
+        
+        /* Shine Overlay */
+        .metallic-card::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.4) 45%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0.4) 55%, transparent 60%);
+            background-size: 200% 100%;
+            animation: shine 5s infinite linear;
+            pointer-events: none;
+            mix-blend-mode: overlay;
         }
+
+        /* Silver Gradient */
+        .bg-tier-silver {
+            background: linear-gradient(135deg, #9ca3af 0%, #d1d5db 25%, #f3f4f6 50%, #d1d5db 75%, #9ca3af 100%);
+            color: #1f2937;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* Grain Texture */
+        .texture-grain {
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            opacity: 0.3;
+            mix-blend-mode: multiply;
+            pointer-events: none;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        body { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
-<body>
-    <main class="mx-auto bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300">
-    <!-- Toast Alert Container -->
-        <div id="toast-container" class="fixed top-4 right-4 text-sm z-50">
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300 min-h-screen flex flex-col font-sans">
+    
+    <main class="mx-auto w-full max-w-md bg-transparent pb-8">
+        <!-- Toast Container -->
+        <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+        <!-- Header -->
+        <header class="px-5 pt-12 pb-4 flex justify-between items-center sticky top-0 z-10 backdrop-blur-md bg-slate-50/80 dark:bg-slate-950/80">
+            <div class="flex items-center gap-3">
+                <div class="relative w-12 h-12 rounded-full overflow-hidden border-2 border-brand shadow-glow cursor-pointer" onclick="showToast('Updating avatar...')">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=b6e3f4" alt="Avatar" class="w-full h-full object-cover">
+                </div>
+                    <div class="flex flex-col">
+                    <span class="text-sm opacity-70">Hello,</span>
+                    <h1 class="text-lg font-bold leading-tight"><span id="user-name">--</span></h1>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-brand transition-colors hover:bg-gray-300 dark:hover:bg-gray-700">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                </button>
+                <button onclick="showToast('Successfully logged out!')" class="text-sm font-medium text-brand hover:opacity-80 transition-opacity">
+                    Log out
+                </button>
+            </div>
+        </header>
+
+        <div class="px-4 space-y-5">
+            
+            <!-- PREMIUM METALLIC CARD -->
+            <div class="w-full aspect-[1.7/1] rounded-card metallic-card bg-tier-silver shadow-metallic p-6 flex flex-col justify-between relative group select-none active:scale-[0.99] transition-transform">
+                <!-- Texture & Decor -->
+                <div class="texture-grain"></div>
+                <div class="absolute top-3 right-6 text-white opacity-80 animate-[twinkle_3s_infinite]"><i class="fas fa-star text-[10px]"></i></div>
+                <div class="absolute bottom-6 left-1/2 text-white opacity-60 animate-[twinkle_4s_infinite_1s]"><i class="fas fa-star text-[8px]"></i></div>
+                
+                <!-- Card Top -->
+                <div class="relative z-10 flex justify-between items-start">
+                    <div>
+                        <h2 id="tier-name" class="text-3xl font-serif font-bold text-slate-800 tracking-widest uppercase drop-shadow-sm">--</h2>
+                        <p class="text-2xl font-bold mt-1 text-slate-900"><span id="points-amount">--</span> <span class="text-sm font-normal text-slate-700">Points</span></p>
+                        <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-600 mt-1 opacity-80">(<span id="points-availability-label">Available</span>)</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full border border-slate-400/50 flex items-center justify-center bg-white/30 backdrop-blur-sm shadow-sm">
+                         <i class="fas fa-crown text-xl text-slate-800"></i>
+                    </div>
+                </div>
+
+                <!-- Card Bottom -->
+                <div class="relative z-10 flex justify-between items-end">
+                    <span class="text-lg font-bold text-slate-800 uppercase tracking-wide font-serif">Lê Gia Huy</span>
+                    <!-- Decorative Icon -->
+                    <i class="fas fa-shield-cat text-6xl text-black/5 absolute bottom-[-15px] right-[-10px] transform -rotate-12 pointer-events-none"></i>
+                </div>
+            </div>
+
+            <!-- Account Info Grid (COLORFUL VERSION) -->
+            <div class="bg-white dark:bg-[#0f172a] rounded-card shadow-sm p-4 border border-gray-100 dark:border-gray-800">
+                <div class="flex justify-between items-center mb-4 border-b border-dashed border-gray-200 dark:border-gray-700 pb-3">
+                    <h3 class="font-bold text-lg">Account Information</h3>
+                    <i class="fas fa-chevron-up text-gray-400"></i>
+                </div>
+
+                <div class="grid grid-cols-4 gap-y-6 gap-x-2">
+                    <!-- 1. Edit Profile (Blue) -->
+                    <a href="ProfileEdit-CSR.html" class="flex flex-col items-center gap-2 group">
+                        <div class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl shadow-sm transition-transform group-active:scale-95 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40">
+                            <i class="fas fa-pen-to-square"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-center leading-tight">Edit<br>profile</span>
+                    </a>
+
+                    <!-- 2. Order History (Teal) -->
+                    <a href="OrderHistory-CSR.html" class="flex flex-col items-center gap-2 group">
+                        <div class="w-12 h-12 rounded-full bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 flex items-center justify-center text-xl shadow-sm transition-transform group-active:scale-95 group-hover:bg-teal-100 dark:group-hover:bg-teal-900/40">
+                            <i class="fas fa-clock-rotate-left"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-center leading-tight">Order<br>history</span>
+                    </a>
+
+                    <!-- 3. Offers (Orange) -->
+                    <a href="Offers-CSR.html" class="flex flex-col items-center gap-2 group">
+                        <div class="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 flex items-center justify-center text-xl shadow-sm transition-transform group-active:scale-95 group-hover:bg-orange-100 dark:group-hover:bg-orange-900/40">
+                            <i class="fas fa-ticket-simple"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-center leading-tight">Your<br>offers</span>
+                    </a>
+
+                    <!-- 4. Privileges (Purple) -->
+                    <a href="MemberPrivileges-CSR.html" class="flex flex-col items-center gap-2 group">
+                        <div class="w-12 h-12 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xl shadow-sm transition-transform group-active:scale-95 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/40">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-center leading-tight">Member<br>privileges</span>
+                    </a>
+                    
+                    <!-- 5. Support (Cyan - New Color) -->
+                    <a href="LiveChatSupport-CSR.html" class="flex flex-col items-center gap-2 group">
+                        <div class="w-12 h-12 rounded-full bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 flex items-center justify-center text-xl shadow-sm transition-transform group-active:scale-95 group-hover:bg-cyan-100 dark:group-hover:bg-cyan-900/40">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-center leading-tight">Support</span>
+                    </a>
+
+                    <!-- 6. Reviews (Rose - New Color) -->
+                    <a href="Reviews-CSR.html" class="flex flex-col items-center gap-2 group">
+                        <div class="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xl shadow-sm transition-transform group-active:scale-95 group-hover:bg-rose-100 dark:group-hover:bg-rose-900/40">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-center leading-tight">Reviews</span>
+                    </a>
+
+                    <!-- 7. Referrals (Yellow/Amber - New Color) -->
+                    <a href="Referral-CSR.html" class="flex flex-col items-center gap-2 group">
+                        <div class="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl shadow-sm transition-transform group-active:scale-95 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/40">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-center leading-tight">Referrals</span>
+                    </a>
+
+                    <!-- 8. Settings (Indigo - New Color) -->
+                    <a href="Settings-CSR.html" class="flex flex-col items-center gap-2 group">
+                        <div class="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl shadow-sm transition-transform group-active:scale-95 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-center leading-tight">Settings</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Points Info -->
+            <div class="bg-white dark:bg-[#0f172a] rounded-card shadow-sm p-4 border border-gray-100 dark:border-gray-800">
+                <div class="flex justify-between items-end mb-2">
+                    <h3 class="text-2xl font-bold text-gray-800 dark:text-white uppercase"><span id="points-info-amount">--</span> Points</h3>
+                    <span class="text-xs text-orange-500 font-medium bg-orange-50 dark:bg-orange-900/30 px-2 py-1 rounded">Expires: <span id="points-expiry">--</span></span>
+                </div>
+                
+                <div class="w-full h-2 bg-gray-100 dark:bg-gray-700 rounded-full mt-2 mb-3 overflow-hidden">
+                    <div id="points-progress" class="h-full bg-gray-400 rounded-full relative" style="width: 0%;">
+                         <div class="absolute top-0 left-0 bottom-0 w-full bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-[shimmer_2s_infinite]"></div>
+                    </div>
+                </div>
+
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    Need <span class="font-bold text-gray-800 dark:text-gray-200" id="points-needed">--</span> more points to reach <span class="font-bold text-yellow-600" id="points-next-tier">GOLD</span>
+                </p>
+            </div>
         </div>
-
-        <!-- Bắt đầu code từ chỗ này (Không sửa template này để có sự nhất quán) -->
-        <!-- Trang để hiển thị và chỉnh sửa thông tin người dùng -->
-
     </main>
+
+    <!-- JS Handling -->
+    <script>
+        // --- 1. Dark Mode Logic ---
+        const toggleTheme = () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                updateMetaTheme('#f8fafc');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                updateMetaTheme('#020618');
+            }
+        }
+
+        const updateMetaTheme = (color) => {
+            const meta = document.querySelector('meta[name="theme-color"][media="(prefers-color-scheme: light)"]');
+            if(meta) meta.setAttribute('content', color);
+        }
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // --- 2. Toast Notification Logic ---
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 toast-slide-in pointer-events-auto min-w-[200px]';
+            toast.innerHTML = `<i class="fas fa-info-circle text-brand"></i><span class="font-medium text-sm">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('toast-slide-in');
+                toast.classList.add('toast-slide-out');
+                toast.addEventListener('animationend', () => toast.remove());
+            }, 3000);
+        }
+    </script>
+    <script>
+        // Data Model
+        const userData = {
+            name: 'Lê Gia Huy',
+            tier: 'Silver',
+            points: 170,
+            nextTier: { name: 'Gold', requiredPoints: 500 },
+            pointsExpiry: '2025-12-31'
+        };
+
+        const formatNumber = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        const formatDate = (isoDate) => {
+            try { return new Date(isoDate).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' }); } catch (e) { return isoDate; }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const userName = document.getElementById('user-name');
+            if (userName) userName.innerText = userData.name;
+
+            const pointsAmount = document.getElementById('points-amount');
+            const pointsInfoAmount = document.getElementById('points-info-amount');
+            if (pointsAmount) pointsAmount.innerText = formatNumber(userData.points);
+            if (pointsInfoAmount) pointsInfoAmount.innerText = formatNumber(userData.points);
+
+            const pointsExpiry = document.getElementById('points-expiry');
+            if (pointsExpiry) pointsExpiry.innerText = formatDate(userData.pointsExpiry);
+
+            const pointsNextTier = document.getElementById('points-next-tier');
+            if (pointsNextTier) pointsNextTier.innerText = userData.nextTier.name;
+
+            const pointsNeeded = document.getElementById('points-needed');
+            const needed = Math.max(0, userData.nextTier.requiredPoints - userData.points);
+            if (pointsNeeded) pointsNeeded.innerText = formatNumber(needed);
+
+            const progress = document.getElementById('points-progress');
+            const percent = Math.min(100, Math.round((userData.points / userData.nextTier.requiredPoints) * 100));
+            if (progress) {
+                progress.style.width = percent + '%';
+                progress.setAttribute('aria-valuenow', percent);
+            }
+
+            const tierName = document.getElementById('tier-name');
+            if (tierName) tierName.innerText = userData.tier;
+        });
+    </script>
 </body>
 </html>

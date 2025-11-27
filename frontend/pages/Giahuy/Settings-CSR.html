@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Cài đặt - ProPlay Hub</title>
+    
+    <!-- Meta Theme Color -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020618">
+
+    <!-- Icons & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Configuration -->
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['"Be Vietnam Pro"', 'sans-serif'],
+                },
+                colors: {
+                    brand: '#ec003f',
+                    slate: {
+                        50: '#f8fafc',
+                        950: '#020618',
+                    }
+                },
+                borderRadius: {
+                    DEFAULT: '0.375rem',
+                    'card': '1rem',
+                    'input': '0.5rem'
+                },
+                boxShadow: {
+                    'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    'glow': '0 0 15px rgba(236, 0, 63, 0.3)'
+                }
+            }
+        }
+      }
+    </script>
+
+    <style>
+        /* Animations */
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        .toast-slide-in { animation: slideIn 0.3s ease-out forwards; }
+        .toast-slide-out { animation: slideOut 0.3s ease-in forwards; }
+        
+        /* Modal Animation */
+        .modal-enter { opacity: 0; transform: scale(0.95); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 0.2s, transform 0.2s; }
+        .modal-exit { opacity: 1; transform: scale(1); }
+        .modal-exit-active { opacity: 0; transform: scale(0.95); transition: opacity 0.2s, transform 0.2s; }
+
+        body { -webkit-tap-highlight-color: transparent; }
+        
+        /* Custom Toggle Switch */
+        .toggle-checkbox:checked { right: 0; border-color: #ec003f; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #ec003f; }
+        
+        /* Custom Input Focus */
+        .input-focus:focus { border-color: #ec003f; outline: none; box-shadow: 0 0 0 1px #ec003f; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300 min-h-screen flex flex-col font-sans">
+
+    <main class="mx-auto w-full max-w-md bg-transparent pb-8 relative z-0">
+        <!-- Toast Container -->
+        <div id="toast-container" class="fixed top-4 right-4 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+
+        <!-- Header -->
+        <header class="px-5 pt-12 pb-4 flex justify-between items-center sticky top-0 z-10 backdrop-blur-md bg-slate-50/90 dark:bg-slate-950/90 border-b border-gray-200/50 dark:border-gray-800/50">
+            <button onclick="history.back()" class="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                <i class="fas fa-arrow-left text-lg"></i>
+            </button>
+            <h1 class="text-lg font-bold">Cài đặt</h1>
+            <div class="w-8"></div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="px-4 py-6 space-y-6">
+            
+            <!-- Group 1: Tài khoản -->
+            <section class="space-y-3">
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Tài khoản & Bảo mật</h2>
+                <div class="bg-white dark:bg-[#0f172a] rounded-card shadow-soft overflow-hidden border border-gray-100 dark:border-gray-800">
+                    
+                    <!-- Change Password Trigger -->
+                    <button onclick="openModal('modal-password')" class="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-900/50 transition-colors border-b border-gray-100 dark:border-gray-800">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 flex items-center justify-center">
+                                <i class="fas fa-lock text-sm"></i>
+                            </div>
+                            <span class="font-medium text-sm">Đổi mật khẩu</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                    </button>
+
+                    <!-- 2FA Toggle -->
+                    <div class="flex items-center justify-between p-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 flex items-center justify-center">
+                                <i class="fas fa-shield-halved text-sm"></i>
+                            </div>
+                            <div class="flex flex-col text-left">
+                                <span class="font-medium text-sm">Xác thực 2 bước</span>
+                                <span class="text-[10px] text-gray-400">Tăng cường bảo mật</span>
+                            </div>
+                        </div>
+                        <label for="toggle-2fa" class="flex items-center cursor-pointer relative">
+                            <input type="checkbox" id="toggle-2fa" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Group 2: Thông báo -->
+            <section class="space-y-3">
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Thông báo</h2>
+                <div class="bg-white dark:bg-[#0f172a] rounded-card shadow-soft overflow-hidden border border-gray-100 dark:border-gray-800">
+                    <div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-orange-50 dark:bg-orange-900/20 text-orange-600 flex items-center justify-center">
+                                <i class="fas fa-bell text-sm"></i>
+                            </div>
+                            <span class="font-medium text-sm">Thông báo đẩy</span>
+                        </div>
+                        <label for="toggle-push" class="flex items-center cursor-pointer relative">
+                            <input type="checkbox" id="toggle-push" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center">
+                                <i class="fas fa-envelope-open-text text-sm"></i>
+                            </div>
+                            <span class="font-medium text-sm">Email khuyến mãi</span>
+                        </div>
+                        <label for="toggle-email" class="flex items-center cursor-pointer relative">
+                            <input type="checkbox" id="toggle-email" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+             <!-- Group 3: Ứng dụng -->
+             <section class="space-y-3">
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Ứng dụng</h2>
+                <div class="bg-white dark:bg-[#0f172a] rounded-card shadow-soft overflow-hidden border border-gray-100 dark:border-gray-800">
+                    
+                    <div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center">
+                                <i class="fas fa-moon text-sm"></i>
+                            </div>
+                            <span class="font-medium text-sm">Chế độ tối (Dark Mode)</span>
+                        </div>
+                        <label for="toggle-theme" class="flex items-center cursor-pointer relative">
+                            <input type="checkbox" id="toggle-theme" class="sr-only peer" onchange="toggleTheme()">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-600"></div>
+                        </label>
+                    </div>
+
+                    <!-- Language Trigger -->
+                    <button onclick="openModal('modal-lang')" class="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-900/50 transition-colors border-b border-gray-100 dark:border-gray-800">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-pink-50 dark:bg-pink-900/20 text-pink-600 flex items-center justify-center">
+                                <i class="fas fa-globe text-sm"></i>
+                            </div>
+                            <span class="font-medium text-sm">Ngôn ngữ</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="current-lang-text" class="text-xs text-gray-400">Tiếng Việt</span>
+                            <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                        </div>
+                    </button>
+
+                    <!-- About Trigger -->
+                    <button onclick="openModal('modal-about')" class="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-900/50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 flex items-center justify-center">
+                                <i class="fas fa-circle-info text-sm"></i>
+                            </div>
+                            <span class="font-medium text-sm">Về ProPlay Hub</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Footer Buttons -->
+            <div class="pt-2 space-y-4">
+                <button onclick="showToast('Đã đăng xuất!')" class="w-full py-3 rounded-card bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    Đăng xuất
+                </button>
+                
+                <p class="text-center text-[10px] text-gray-400">
+                    ProPlay Hub v1.0.2 (Build 20241126)<br>
+                    Designed for Pixel 7
+                </p>
+
+                <button onclick="if(confirm('Bạn có chắc chắn muốn xóa tài khoản? Hành động này không thể hoàn tác.')) showToast('Đã gửi yêu cầu xóa tài khoản')" class="w-full text-xs text-red-500 hover:text-red-600 underline decoration-red-500/30">
+                    Yêu cầu xóa tài khoản
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL LAYOUTS -->
+    
+    <!-- 1. Change Password Modal -->
+    <div id="modal-password" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modal-password')"></div>
+        <!-- Modal Content -->
+        <div class="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#0f172a] rounded-t-2xl p-6 shadow-xl transform transition-transform duration-300 max-w-md mx-auto">
+            <div class="w-12 h-1 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6"></div>
+            <h3 class="text-lg font-bold mb-4">Đổi mật khẩu</h3>
+            <div class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-xs font-medium text-gray-500">Mật khẩu hiện tại</label>
+                    <input type="password" id="pass-current" class="w-full p-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-gray-700 rounded-lg input-focus dark:text-white" placeholder="••••••••">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-medium text-gray-500">Mật khẩu mới</label>
+                    <input type="password" id="pass-new" class="w-full p-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-gray-700 rounded-lg input-focus dark:text-white" placeholder="••••••••">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-medium text-gray-500">Xác nhận mật khẩu mới</label>
+                    <input type="password" id="pass-confirm" class="w-full p-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-gray-700 rounded-lg input-focus dark:text-white" placeholder="••••••••">
+                </div>
+                <button onclick="savePassword()" class="w-full bg-brand text-white font-bold py-3 rounded-lg mt-2 shadow-glow">
+                    Cập nhật mật khẩu
+                </button>
+                <button onclick="closeModal('modal-password')" class="w-full py-3 text-gray-500 text-sm">Hủy bỏ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Language Modal -->
+    <div id="modal-lang" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modal-lang')"></div>
+        <div class="relative bg-white dark:bg-[#0f172a] w-full max-w-xs rounded-2xl p-4 shadow-xl">
+            <h3 class="text-lg font-bold mb-4 text-center">Chọn ngôn ngữ</h3>
+            <div class="space-y-2">
+                <label class="flex items-center justify-between p-3 rounded-lg border border-brand/50 bg-brand/5 cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <img src="https://flagcdn.com/w40/vn.png" class="w-6 h-4 object-cover rounded shadow-sm">
+                        <span class="font-medium text-sm">Tiếng Việt</span>
+                    </div>
+                    <div class="w-4 h-4 rounded-full border-4 border-brand"></div>
+                </label>
+                <label class="flex items-center justify-between p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer" onclick="changeLang('English')">
+                    <div class="flex items-center gap-3">
+                        <img src="https://flagcdn.com/w40/us.png" class="w-6 h-4 object-cover rounded shadow-sm">
+                        <span class="font-medium text-sm">English</span>
+                    </div>
+                    <div class="w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600"></div>
+                </label>
+            </div>
+            <button onclick="closeModal('modal-lang')" class="w-full mt-4 py-2 text-gray-500 text-sm">Đóng</button>
+        </div>
+    </div>
+
+    <!-- 3. About Modal -->
+    <div id="modal-about" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modal-about')"></div>
+        <div class="relative bg-white dark:bg-[#0f172a] w-full max-w-xs rounded-2xl p-6 shadow-xl text-center">
+            <div class="w-16 h-16 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-1">ProPlay Hub</h3>
+            <p class="text-xs text-gray-500 mb-4">Version 1.0.2 (Beta)</p>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+                Ứng dụng tích điểm và đặt hàng dành riêng cho thành viên ProPlay. Tận hưởng ưu đãi độc quyền và trải nghiệm mua sắm tiện lợi.
+            </p>
+            <div class="text-xs text-gray-400 border-t border-gray-100 dark:border-gray-800 pt-4 mb-4">
+                © 2024 ProPlay Inc. All rights reserved.
+            </div>
+            <button onclick="closeModal('modal-about')" class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white px-6 py-2 rounded-full text-sm font-medium">Đã hiểu</button>
+        </div>
+    </div>
+
+
+    <!-- Scripts -->
+    <script>
+        // --- 1. Theme Logic ---
+        const toggleTheme = () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                updateMetaTheme('#f8fafc');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                updateMetaTheme('#020618');
+            }
+        }
+
+        const updateMetaTheme = (color) => {
+            const meta = document.querySelector('meta[name="theme-color"][media="(prefers-color-scheme: light)"]');
+            if(meta) meta.setAttribute('content', color);
+        }
+
+        const initTheme = () => {
+            const isDark = localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                const themeToggle = document.getElementById('toggle-theme');
+                if(themeToggle) themeToggle.checked = true;
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+        initTheme();
+
+        // --- 2. Toast Logic ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let icon = 'fa-info-circle';
+            let color = 'text-brand';
+            if (type === 'success') { icon = 'fa-check-circle'; color = 'text-green-500'; }
+            if (type === 'error') { icon = 'fa-exclamation-circle'; color = 'text-red-500'; }
+
+            toast.className = 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 toast-slide-in pointer-events-auto min-w-[200px] shadow-soft z-50';
+            toast.innerHTML = `<i class="fas ${icon} ${color}"></i><span class="font-medium text-sm">${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('toast-slide-in');
+                toast.classList.add('toast-slide-out');
+                toast.addEventListener('animationend', () => toast.remove());
+            }, 2500);
+        }
+
+        // --- 3. Modal Logic (NEW) ---
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('hidden');
+            // Small timeout to allow removing hidden before adding animation class could be better, 
+            // but for simple visibility toggle, this works fine or we can add CSS animation classes here.
+            modal.querySelector('div[class*="absolute bottom-0"], div[class*="relative bg-white"]').classList.add('modal-enter-active');
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('hidden');
+        }
+
+        // --- 4. Change Password Logic (NEW) ---
+        function savePassword() {
+            const current = document.getElementById('pass-current').value;
+            const newPass = document.getElementById('pass-new').value;
+            const confirmPass = document.getElementById('pass-confirm').value;
+
+            if (!current || !newPass || !confirmPass) {
+                showToast('Vui lòng điền đầy đủ thông tin', 'error');
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                showToast('Mật khẩu xác nhận không khớp', 'error');
+                return;
+            }
+
+            // Simulate API call
+            closeModal('modal-password');
+            showToast('Đang cập nhật...', 'info');
+            setTimeout(() => {
+                showToast('Đổi mật khẩu thành công!', 'success');
+                // Clear inputs
+                document.getElementById('pass-current').value = '';
+                document.getElementById('pass-new').value = '';
+                document.getElementById('pass-confirm').value = '';
+            }, 1000);
+        }
+
+        // --- 5. Language Logic (NEW) ---
+        function changeLang(lang) {
+            // Just a visual simulation
+            if (lang === 'English') {
+                showToast('Switched to English', 'success');
+                document.getElementById('current-lang-text').innerText = 'English';
+            } else {
+                showToast('Đã chuyển sang Tiếng Việt', 'success');
+                document.getElementById('current-lang-text').innerText = 'Tiếng Việt';
+            }
+            closeModal('modal-lang');
+        }
+    </script>
+</body>
+</html>
