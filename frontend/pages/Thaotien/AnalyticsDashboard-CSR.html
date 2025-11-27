@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <!-- Tên và mô tả ứng dụng -->
     <meta name="application-name" content="ProPlay Hub">
-    <meta name="description" content="Mô tả ngắn gọn về ứng dụng của bạn">
+    <meta name="description" content="Short description of your app">
 
     <!-- Màu chủ đạo khi hiển thị (thanh status, taskbar, v.v.) -->
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc">
@@ -74,10 +74,10 @@
 
         </div>
 
-        <!-- Bắt đầu code từ chỗ này (Không sửa template này để có sự nhất quán) -->
-        <!-- Trang để hiển thị thống khê / CUSTOMER VIEW (CSR) - Mobile-first (Pixel 7) -->
+        <!-- Start code here (Do not change outer template) -->
+        <!-- Customer View Page - Mobile-first (Pixel 7) -->
         
-        <!-- Styles specific to this page (kept inside main as requested) -->
+        <!-- Page-specific styles -->
         <style>
             :root{
                 --primary: #ec003f;
@@ -90,7 +90,6 @@
                 --card-dark: #1a1a1a;
             }
 
-            /* page wrapper - center and limit width for mobile prototype */
             .pph-mobile {
                 max-width: 430px;
                 margin: 0 auto;
@@ -98,7 +97,7 @@
                 background: var(--light-bg);
                 color: var(--light-text);
                 font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-                padding-bottom: 90px; /* space for bottom actions if needed */
+                padding-bottom: 90px;
             }
             @media (prefers-color-scheme: dark) {
                 .pph-mobile { background: var(--dark-bg); color: var(--dark-text); }
@@ -166,7 +165,6 @@
             .pph-btn-primary { background:var(--primary); color:white; }
             .pph-btn-outline { background:transparent; color:var(--primary); border:1px solid var(--primary); }
 
-            /* small responsive tweaks */
             @media (min-width:640px) {
                 .pph-mobile { box-shadow: 0 12px 40px rgba(2,6,23,0.06); border-radius:12px; margin-top:18px; overflow:hidden; }
             }
@@ -251,25 +249,21 @@
         </div>
 
         <script>
-            // Small JS to wire actions (kept simple — backend integration omitted)
+            // Small JS to wire actions
             document.getElementById('openChatBtn').addEventListener('click', function(){
-                // navigate to the live chat page in your app
-                // example: location.href = '/live-chat.html?user=44281';
-                alert('Mở Live Chat với Alex Johnson (demo).');
+                alert('Opening Live Chat with Alex Johnson (demo).');
             });
 
             document.getElementById('suspendBtn').addEventListener('click', function(){
-                if (confirm('Bạn có chắc muốn tạm khoá tài khoản này không?')) {
-                    // call API to suspend account (demo only)
-                    alert('Tài khoản đã bị tạm khoá (demo).');
-                    // update badge
+                if (confirm('Are you sure you want to suspend this account?')) {
+                    alert('Account has been suspended (demo).');
                     document.getElementById('custStatus').textContent = 'Suspended';
                     document.getElementById('custStatus').style.background = '#666';
                 }
             });
         </script>
 
-        <!-- Kết thúc phần bắt đầu code từ chỗ này -->
+        <!-- End of page-specific code -->
     </main>
 </body>
 </html>
