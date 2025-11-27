@@ -1,206 +1,301 @@
-<!-- MOBILE APP – LIVE CHAT SUPPORT PAGE (Google Pixel 7 Optimized) -->
-<style>
-    :root {
-        --primary: #ec003f;
-        --light-bg: #f8fafc;
-        --light-text: #020618;
-        --dark-bg: #020618;
-        --dark-text: #f8fafc;
-        --radius: 0.375rem;
-        --card-light: #ffffff;
-        --card-dark: #1a1a1a;
-    }
+<!-- 
+  PROPLAY HUB - LIVE CHAT SUPPORT (Standalone)
+  - Dedicated interface for Customer Support.
+  - Auto Dark Mode based on system settings (media query).
+  - Real-time messaging using Firestore.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <title>Live Chat Support - ProPlay Hub</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-    body {
-        margin: 0;
-        background: var(--light-bg);
-        color: var(--light-text);
-        font-family: "Inter", sans-serif;
-    }
-    body.dark-mode { background: var(--dark-bg); color: var(--dark-text); }
+    <script>
+        // Tailwind Config: Use 'media' to respect system preferences automatically
+        tailwind.config = {
+            darkMode: 'media', 
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#ec003f', // Brand Color
+                        'dark-bg': '#020618',
+                        'light-bg': '#f8fafc',
+                        'card-dark': '#0c1221', 
+                        'bubble-user': '#ec003f',
+                        'bubble-other': '#e2e8f0',
+                        'bubble-other-dark': '#1e293b',
+                    },
+                    borderRadius: {
+                        'lg': '0.375rem',
+                        'xl': '1rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Toast Animation */
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        .toast-slide-in { animation: slideIn 0.3s ease-out forwards; }
+        .toast-slide-out { animation: slideOut 0.3s ease-in forwards; }
+        
+        /* Main container simulating mobile screen */
+        main {
+            padding-bottom: 0; /* Full height for chat */
+            max-width: 420px; 
+            margin-left: auto;
+            margin-right: auto;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
 
-    .mobile-app {
-        max-width: 430px;
-        margin: auto;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        background: var(--light-bg);
-        padding-bottom: 80px;
-    }
-    body.dark-mode .mobile-app { background: var(--dark-bg); }
+        /* Chat window styling - Takes remaining height */
+        #chat-window {
+            flex-grow: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            /* Custom Scrollbar Styling */
+            scrollbar-width: thin;
+            scrollbar-color: #ec003f transparent;
+        }
+        
+        /* Smooth color transitions */
+        body, div, p, span, h1, h2, h3, button, input, header {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+    </style>
+</head>
 
-    /* TOP BAR */
-    .topbar {
-        padding: 18px 20px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        position: sticky;
-        top: 0;
-        background: var(--light-bg);
-        z-index: 20;
-    }
-    body.dark-mode .topbar { background: var(--dark-bg); }
+<body class="bg-light-bg text-gray-900 dark:bg-dark-bg dark:text-slate-100 h-screen overflow-hidden">
+    
+    <main class="relative">
+        <!-- Toast Alert Container -->
+        <div id="toast-container" class="fixed top-4 right-4 text-sm z-50 pointer-events-none"></div>
 
-    .back-btn {
-        font-size: 20px;
-        cursor: pointer;
-    }
-    .support-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--primary);
-    }
+        <!-- HEADER -->
+        <header class="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-dark-bg/80 backdrop-blur-md sticky top-0 z-10">
+            <div class="flex items-center space-x-3">
+                <!-- Agent Avatar/Status -->
+                <div class="relative">
+                    <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold border border-primary/20">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <span class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white dark:border-dark-bg"></span>
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-lg font-bold">ProPlay Support</h1>
+                    <p class="text-[10px] text-green-600 dark:text-green-400 font-medium flex items-center">
+                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-green-500 mr-1"></span> Online
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex items-center space-x-2">
+                <button class="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="End Chat">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </header>
 
-    /* CHAT AREA */
-    .chat-container {
-        flex: 1;
-        padding: 15px 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        overflow-y: auto;
-    }
+        <!-- CHAT AREA -->
+        <div id="chat-window" class="p-4 space-y-4 bg-slate-50 dark:bg-dark-bg">
+            <!-- System Message -->
+            <div class="flex justify-center my-4">
+                <span class="text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-3 py-1 rounded-full">
+                    Chat started <span id="start-time"></span>
+                </span>
+            </div>
 
-    .msg {
-        max-width: 75%;
-        padding: 12px 14px;
-        border-radius: var(--radius);
-        font-size: 14px;
-        line-height: 1.4;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .msg.user {
-        align-self: flex-end;
-        background: var(--primary);
-        color: white;
-        border-bottom-right-radius: 0;
-    }
-
-    .msg.support {
-        align-self: flex-start;
-        background: var(--card-light);
-        border-bottom-left-radius: 0;
-    }
-    body.dark-mode .msg.support {
-        background: var(--card-dark);
-    }
-
-    .time {
-        font-size: 11px;
-        opacity: 0.6;
-        margin-top: 4px;
-    }
-
-    /* INPUT BAR */
-    .input-bar {
-        position: fixed;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        max-width: 430px;
-        width: 100%;
-        background: var(--card-light);
-        display: flex;
-        align-items: center;
-        padding: 12px 15px;
-        gap: 10px;
-        border-top: 1px solid #ddd;
-    }
-    body.dark-mode .input-bar {
-        background: var(--card-dark);
-        border-color: #333;
-    }
-
-    .chat-input {
-        flex: 1;
-        padding: 12px;
-        border-radius: var(--radius);
-        border: 1px solid #ccc;
-        font-size: 14px;
-    }
-
-    .send-btn {
-        background: var(--primary);
-        color: white;
-        padding: 10px 14px;
-        border-radius: var(--radius);
-        border: none;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-    /* LOADING DOTS */
-    .typing {
-        background: var(--card-light);
-        padding: 10px 14px;
-        border-radius: var(--radius);
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    body.dark-mode .typing { background: var(--card-dark); }
-
-    .dot {
-        width: 6px;
-        height: 6px;
-        background: #bbb;
-        border-radius: 50%;
-        animation: blink 1.4s infinite both;
-    }
-
-    .dot:nth-child(2) { animation-delay: 0.2s; }
-    .dot:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes blink {
-        0% { opacity: .2; }
-        20% { opacity: 1; }
-        100% { opacity: .2; }
-    }
-</style>
-
-<div class="mobile-app">
-
-    <!-- TOP BAR -->
-    <div class="topbar">
-        <div class="back-btn">←</div>
-        <div class="support-title">Live Support</div>
-    </div>
-
-    <!-- CHAT AREA -->
-    <div class="chat-container">
-
-        <div class="msg support">
-            Hello! 👋 How can I assist you today?
-            <div class="time">09:41 AM</div>
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="flex justify-center mt-10">
+                <i class="fas fa-circle-notch fa-spin text-primary text-2xl"></i>
+            </div>
+            
+            <!-- Messages will be injected here -->
         </div>
 
-        <div class="msg user">
-            Hi! I need help with my subscription.
-            <div class="time">09:42 AM</div>
+        <!-- INPUT AREA -->
+        <div class="p-3 bg-white dark:bg-card-dark border-t border-slate-200 dark:border-slate-800 shrink-0">
+            <div class="flex items-end space-x-2">
+                <button class="p-3 text-slate-400 hover:text-primary transition">
+                    <i class="fas fa-paperclip"></i>
+                </button>
+                <div class="flex-grow relative">
+                    <input type="text" id="chat-input" placeholder="Type your message..." class="w-full p-3 pr-10 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-gray-900 dark:text-slate-100 transition-all">
+                    <button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-primary">
+                        <i class="far fa-smile"></i>
+                    </button>
+                </div>
+                <button id="send-chat-btn" class="h-11 w-11 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 active:scale-95 transition transform">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <div class="text-center mt-2">
+                <p class="text-[10px] text-slate-400">
+                    User ID: <span id="user-id-display" class="font-mono">Connecting...</span>
+                </p>
+            </div>
         </div>
 
-        <div class="msg support">
-            Of course! Can you tell me what issue you're experiencing?
-            <div class="time">09:42 AM</div>
-        </div>
+    </main>
 
-        <!-- Typing indicator -->
-        <div class="typing">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-        </div>
+    <!-- Scripts Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    </div>
+        // Global Vars
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const CHAT_COLLECTION = `/artifacts/${appId}/public/data/live_chat_support`;
 
-</div>
+        let app, db, auth, currentUserId;
 
-<!-- INPUT BAR -->
-<div class="input-bar">
-    <input class="chat-input" placeholder="Type a message...">
-    <button class="send-btn">Send</button>
-</div>
+        // --- Helpers ---
+        function showToast(msg, type='info') {
+            const container = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            const bg = type === 'success' ? 'bg-green-600' : (type === 'error' ? 'bg-red-500' : 'bg-slate-800 dark:bg-slate-700');
+            el.className = `${bg} text-white px-4 py-2 rounded-full shadow-lg mb-2 text-xs font-medium toast-slide-in pointer-events-auto`;
+            el.innerHTML = msg;
+            container.appendChild(el);
+            setTimeout(() => {
+                el.classList.replace('toast-slide-in', 'toast-slide-out');
+                setTimeout(() => el.remove(), 300);
+            }, 3000);
+        }
+
+        // Format Time
+        document.getElementById('start-time').innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        // --- Chat Logic ---
+        function renderMsg(msg) {
+            const win = document.getElementById('chat-window');
+            // Remove loading indicator if present
+            const loader = document.getElementById('loading-indicator');
+            if (loader) loader.remove();
+
+            const isMe = msg.uid === currentUserId;
+            const div = document.createElement('div');
+            div.className = `flex w-full mb-4 ${isMe ? 'justify-end' : 'justify-start'}`;
+            
+            // Dynamic Styles for Bubbles based on Dark Mode and Sender
+            // Me: Primary Color | Others: Gray (Light) / Dark Slate (Dark)
+            const bubbleColor = isMe 
+                ? 'bg-primary text-white rounded-br-none shadow-primary/30' 
+                : 'bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-bl-none shadow-sm';
+
+            // Avatar Logic
+            const avatarHTML = !isMe 
+                ? `<div class="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 flex items-center justify-center text-xs font-bold mr-2 border border-indigo-200 dark:border-indigo-800 flex-shrink-0">
+                    ${msg.uid.substring(0,2).toUpperCase()}
+                   </div>` 
+                : '';
+
+            const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '...';
+
+            div.innerHTML = `
+                ${avatarHTML}
+                <div class="max-w-[75%] flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                    <div class="px-4 py-2.5 rounded-2xl text-sm ${bubbleColor} shadow-md break-words">
+                        ${msg.text}
+                    </div>
+                    <span class="text-[10px] text-slate-400 mt-1 px-1">${time}</span>
+                </div>
+            `;
+            
+            win.appendChild(div);
+            win.scrollTop = win.scrollHeight;
+        }
+
+        async function setupChat() {
+            if(!db) return;
+            const q = query(collection(db, CHAT_COLLECTION), orderBy('timestamp', 'asc'));
+            
+            onSnapshot(q, (snap) => {
+                if (snap.empty) {
+                    document.getElementById('loading-indicator').innerHTML = '<span class="text-xs text-slate-400">No messages yet. Say hello!</span>';
+                }
+                snap.docChanges().forEach(change => {
+                    if(change.type === 'added') renderMsg(change.doc.data());
+                });
+            }, (error) => {
+                console.error("Chat listener error:", error);
+                showToast("Connection lost. Retrying...", "error");
+            });
+
+            document.getElementById('send-chat-btn').addEventListener('click', sendMsg);
+            document.getElementById('chat-input').addEventListener('keypress', e => {
+                if(e.key === 'Enter') sendMsg();
+            });
+        }
+
+        async function sendMsg() {
+            const input = document.getElementById('chat-input');
+            const txt = input.value.trim();
+            if(!txt) return;
+            
+            // Optimistic UI: Clear input immediately
+            input.value = '';
+            input.focus();
+
+            try {
+                await addDoc(collection(db, CHAT_COLLECTION), {
+                    uid: currentUserId,
+                    text: txt,
+                    timestamp: serverTimestamp()
+                });
+            } catch(e) {
+                console.error(e);
+                showToast('Failed to send message', 'error');
+                input.value = txt; // Restore text on failure
+            }
+        }
+
+        // --- Init ---
+        async function init() {
+            // Firebase Setup
+            if(!firebaseConfig) {
+                console.warn("No Firebase Config");
+                currentUserId = 'demo-user';
+                document.getElementById('user-id-display').textContent = 'Demo Mode';
+                // Remove loader for demo
+                document.getElementById('loading-indicator').remove();
+                return;
+            }
+
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if(initialAuthToken) await signInWithCustomToken(auth, initialAuthToken);
+                else await signInAnonymously(auth);
+
+                onAuthStateChanged(auth, u => {
+                    if(u) {
+                        currentUserId = u.uid;
+                        document.getElementById('user-id-display').textContent = u.uid.substring(0, 8);
+                        setupChat();
+                    }
+                });
+            } catch (err) {
+                console.error("Init Error", err);
+                showToast("Initialization failed", "error");
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
