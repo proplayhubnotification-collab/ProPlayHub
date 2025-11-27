@@ -1,238 +1,385 @@
-<!-- MOBILE APP – CUSTOMER VIEW (CSR PANEL) – GOOGLE PIXEL 7 OPTIMIZED -->
-<style>
-    :root {
-        --primary: #ec003f;
-        --light-bg: #f8fafc;
-        --light-text: #020618;
-        --dark-bg: #020618;
-        --dark-text: #f8fafc;
-        --radius: 0.375rem;
-        --card-light: #ffffff;
-        --card-dark: #1a1a1a;
-    }
+<!-- 
+  CSR CUSTOMER VIEW INTERFACE (UI ONLY / FRONTEND)
+  - Purpose: To demonstrate the full CSR tool interface and functionality using Mock Data.
+  - Features: Customer List, Search/Filter, Subscription Management, Ban/Unban, and CSR Private Notes.
+  - Backend: Firebase/Firestore connection is disabled. All actions are simulated (MOCK).
+  - Design: Adaptive layout with Auto Dark Mode.
+  - Language: English.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <title>Customer Management - ProPlay Hub CSR (UI Only)</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-    body {
-        margin: 0;
-        background: var(--light-bg);
-        color: var(--light-text);
-        font-family: "Inter", sans-serif;
-    }
-    body.dark-mode { background: var(--dark-bg); color: var(--dark-text); }
+    <script>
+        // Tailwind Configuration for Auto Dark Mode
+        tailwind.config = {
+            darkMode: 'media', 
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#ec003f', // Brand Color
+                        'dark-bg': '#020618',
+                        'light-bg': '#f8fafc',
+                        'card-light': '#ffffff',
+                        'card-dark': '#0c1221', 
+                        'alert-red': '#dc2626',
+                        'alert-yellow': '#f59e0b',
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03)',
+                        'card-dark': '0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -4px rgba(0, 0, 0, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* General styling for transitions and fluid view */
+        body, div, p, span, h1, h2, h3, button, input, select, textarea {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        /* Custom Scrollbar Styling for list */
+        #customer-list-container {
+            scrollbar-width: thin;
+            scrollbar-color: #ec003f transparent;
+        }
 
-    .mobile-app {
-        max-width: 430px;
-        margin: auto;
-        min-height: 100vh;
-        background: var(--light-bg);
-        padding-bottom: 80px;
-    }
-    body.dark-mode .mobile-app { background: var(--dark-bg); }
+        /* Responsive Layout: Full width on mobile, max-w-4xl on desktop */
+        .container-responsive {
+            max-width: 100%;
+        }
+        @media (min-width: 1024px) {
+            .container-responsive {
+                max-width: 1024px;
+            }
+        }
+    </style>
+</head>
 
-    /* TOP BAR */
-    .topbar {
-        padding: 18px 20px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        position: sticky;
-        top: 0;
-        background: var(--light-bg);
-        z-index: 20;
-    }
-    body.dark-mode .topbar { background: var(--dark-bg); }
+<body class="bg-light-bg text-gray-900 dark:bg-dark-bg dark:text-slate-100 min-h-screen">
+    
+    <div class="container-responsive mx-auto p-4 md:p-8">
+        <!-- HEADER -->
+        <header class="mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+            <h1 class="text-3xl font-extrabold text-primary flex items-center">
+                <i class="fas fa-users-cog mr-3"></i> 
+                Customer Management (CSR)
+            </h1>
+            <p class="text-slate-500 dark:text-slate-400 mt-1">
+                UI Only Mode - Simulated viewing and updating of customer profiles.
+            </p>
+            <p class="text-[10px] text-slate-400 mt-2">
+                CSR User ID: <span id="user-id-display" class="font-mono">CSR-MOCK-001</span>
+            </p>
+        </header>
 
-    .back-btn {
-        font-size: 20px;
-        cursor: pointer;
-    }
+        <!-- SEARCH AND FILTER -->
+        <div class="mb-6 p-4 rounded-xl bg-card-light dark:bg-card-dark shadow-lg border border-slate-200 dark:border-slate-700">
+            <div class="relative">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="search-input" placeholder="Search by ID, Email, Subscription Type (Pro, Banned, Active)..." 
+                       class="w-full pl-12 pr-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-gray-900 dark:text-slate-100">
+            </div>
+        </div>
 
-    .page-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--primary);
-    }
+        <!-- CUSTOMER LIST -->
+        <h2 class="text-xl font-semibold mb-3">Current Customer List</h2>
+        
+        <div id="customer-list-container" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+            <!-- Customer cards will be injected here by JavaScript -->
+        </div>
 
-    /* CUSTOMER HEADER */
-    .customer-header {
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
+        <!-- Toast Alert Container -->
+        <div id="toast-container" class="fixed bottom-4 right-4 text-sm z-50 pointer-events-none"></div>
 
-    .avatar {
-        width: 55px;
-        height: 55px;
-        border-radius: 50%;
-        background: #d1d5db;
-    }
-
-    .cust-info .name {
-        font-size: 18px;
-        font-weight: 700;
-    }
-    .cust-info .id {
-        font-size: 13px;
-        opacity: 0.6;
-    }
-
-    /* SECTION CARD */
-    .section-card {
-        background: var(--card-light);
-        margin: 15px 20px;
-        padding: 20px;
-        border-radius: var(--radius);
-        box-shadow: 0 4px 18px rgba(0,0,0,0.06);
-    }
-    body.dark-mode .section-card {
-        background: var(--card-dark);
-    }
-
-    .section-title {
-        font-size: 16px;
-        font-weight: 700;
-        margin-bottom: 12px;
-        color: var(--primary);
-    }
-
-    .info-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-        font-size: 14px;
-    }
-    .info-label {
-        opacity: 0.7;
-    }
-
-    /* SUBSCRIPTION BADGE */
-    .badge {
-        padding: 6px 10px;
-        background: var(--primary);
-        color: white;
-        border-radius: var(--radius);
-        display: inline-block;
-        font-size: 13px;
-        font-weight: 600;
-        margin-top: 8px;
-    }
-
-    /* ACTIVITY LOG */
-    .log-item {
-        padding: 12px 0;
-        border-bottom: 1px solid rgba(0,0,0,0.1);
-    }
-    body.dark-mode .log-item { border-color: rgba(255,255,255,0.1); }
-
-    .log-action {
-        font-size: 14px;
-        font-weight: 600;
-    }
-    .log-time {
-        font-size: 12px;
-        opacity: .6;
-    }
-
-    /* ACTION BUTTONS */
-    .action-btn {
-        width: 100%;
-        padding: 14px;
-        border: none;
-        border-radius: var(--radius);
-        font-weight: 700;
-        cursor: pointer;
-        margin-top: 12px;
-        font-size: 15px;
-    }
-
-    .btn-red { background: var(--primary); color: white; }
-    .btn-red:hover { background: #d1002f; }
-
-    .btn-outline {
-        background: transparent;
-        border: 1px solid var(--primary);
-        color: var(--primary);
-    }
-
-</style>
-
-<!-- PAGE CONTENT -->
-<div class="mobile-app">
-
-    <!-- Top Bar -->
-    <div class="topbar">
-        <div class="back-btn">←</div>
-        <div class="page-title">Customer Profile</div>
     </div>
 
-    <!-- Customer Profile Header -->
-    <div class="customer-header">
-        <div class="avatar"></div>
-        <div class="cust-info">
-            <div class="name">Alex Johnson</div>
-            <div class="id">User ID: #44281</div>
-        </div>
-    </div>
+    <!-- Scripts Logic -->
+    <script>
+        let allCustomers = []; // Client-side cache for filtering
+        const SUBSCRIPTION_TIERS = ['Free', 'Standard', 'Pro'];
+        
+        // --- Mock Data ---
+        function getMockCustomers() {
+            // Use Date.now() to simulate timestamps
+            const now = Date.now();
+            return [
+                {
+                    id: 'mock-001', userId: 'PRO-9432-XYZ', email: 'alice@example.com', displayName: 'Alice Smith',
+                    status: 'Active', subscription: 'Pro', activityScore: 92,
+                    joinedAt: new Date(now - 86400000 * 30), // 30 days ago
+                    activityLog: [
+                        { action: 'Completed tutorial', timestamp: new Date(now - 3600000) },
+                        { action: 'Made a purchase ($19.99)', timestamp: new Date(now - 7200000) },
+                    ],
+                    note: 'Key customer, prioritize support.'
+                },
+                {
+                    id: 'mock-002', userId: 'FREE-1122-ABC', email: 'bob@example.com', displayName: 'Bob Johnson',
+                    status: 'Banned', subscription: 'Free', activityScore: 5,
+                    joinedAt: new Date(now - 86400000 * 50), // 50 days ago
+                    activityLog: [
+                        { action: 'Submitted support ticket (abuse)', timestamp: new Date(now - 3600000 * 10) },
+                        { action: 'Received ban notification', timestamp: new Date(now - 3600000 * 15) },
+                    ],
+                    note: 'Banned due to violation of term 3.1.'
+                },
+                {
+                    id: 'mock-003', userId: 'STD-8765-DEF', email: 'charlie@example.com', displayName: 'Charlie Brown',
+                    status: 'Active', subscription: 'Standard', activityScore: 15, // Low score to trigger alert
+                    joinedAt: new Date(now - 86400000 * 10), // 10 days ago
+                    activityLog: [
+                        { action: 'Created account', timestamp: new Date(now - 3600000 * 2) },
+                        { action: 'Viewed pricing page', timestamp: new Date(now - 3600000 * 4) },
+                    ],
+                    note: 'Follow up for potential upgrade to Pro.'
+                },
+                {
+                    id: 'mock-004', userId: 'FREE-0000-GHI', email: 'david@example.com', displayName: 'David Lee',
+                    status: 'Pending', subscription: 'Free', activityScore: 50, 
+                    joinedAt: new Date(now - 86400000 * 5),
+                    activityLog: [],
+                    note: '' // No note
+                }
+            ];
+        }
 
-    <!-- Account Info -->
-    <div class="section-card">
-        <div class="section-title">Account Information</div>
+        // --- Helper Functions ---
+        function showToast(msg, type='info') {
+            const container = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            const bg = type === 'success' ? 'bg-green-600' : (type === 'error' ? 'bg-red-500' : 'bg-slate-800 dark:bg-slate-700');
+            el.className = `${bg} text-white px-4 py-2 rounded-full shadow-lg mb-2 text-xs font-medium opacity-0 transition-opacity duration-300 pointer-events-auto`;
+            el.innerHTML = msg;
+            container.appendChild(el);
+            // Simple fade-in animation
+            setTimeout(() => el.style.opacity = '1', 10); 
+            setTimeout(() => el.remove(), 4000); 
+        }
 
-        <div class="info-row">
-            <div class="info-label">Email</div>
-            <div>alex.johnson@example.com</div>
-        </div>
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // --- Mock Logic (No Backend) ---
+        function mockUpdate(action, docId) {
+            showToast(`[MOCK] Action Simulated: ${action} for customer ${docId.substring(0, 8)}`, "success");
+            
+            // Update the mock data in the cache to reflect the change visually
+            const customer = allCustomers.find(c => c.id === docId);
+            if (!customer) return;
 
-        <div class="info-row">
-            <div class="info-label">Phone</div>
-            <div>+1 555 789 4321</div>
-        </div>
+            if (action.includes("Save Note")) {
+                const noteTextarea = document.getElementById(`note-text-${docId}`);
+                customer.note = noteTextarea.value;
+                customer.lastUpdated = Date.now(); // Simulate timestamp update
+            } else if (action.includes("Change Tier")) {
+                const subSelect = document.getElementById(`sub-select-${docId}`);
+                customer.subscription = subSelect.value;
+            } else if (action.includes("Ban Account")) {
+                customer.status = 'Banned';
+            } else if (action.includes("Unban")) {
+                customer.status = 'Active';
+            }
 
-        <div class="info-row">
-            <div class="info-label">Joined</div>
-            <div>Jan 14, 2024</div>
-        </div>
-    </div>
+            // Re-render the list to update the UI based on the new mock state
+            filterCustomers();
+        }
 
-    <!-- Subscription -->
-    <div class="section-card">
-        <div class="section-title">Subscription</div>
 
-        <div class="info-row">
-            <div class="info-label">Status</div>
-            <div class="badge">PRO+ Active</div>
-        </div>
+        // --- UI Rendering ---
+        function renderCustomerCard(customer) {
+            const docId = customer.id;
 
-        <div class="info-row">
-            <div class="info-label">Valid Until</div>
-            <div>Dec 12, 2025</div>
-        </div>
-    </div>
+            // Status Colors and Text
+            let statusColor, statusText;
+            if (customer.status === 'Banned') {
+                statusColor = 'bg-red-500';
+                statusText = 'BANNED';
+            } else if (customer.status === 'Active') {
+                statusColor = 'bg-green-500';
+                statusText = 'ACTIVE';
+            } else {
+                statusColor = 'bg-yellow-500';
+                statusText = 'Pending';
+            }
+            
+            // System Alert Logic
+            let systemAlertHTML = '';
+            if (customer.activityScore < 20 && customer.status !== 'Banned') {
+                systemAlertHTML += `<div class="p-2 bg-alert-yellow/20 text-alert-yellow rounded-lg text-xs font-medium flex items-center mb-2">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Low Activity Score (${customer.activityScore}). Risk of Churn.
+                </div>`;
+            }
+            if (customer.status === 'Banned') {
+                systemAlertHTML += `<div class="p-2 bg-alert-red/20 text-alert-red rounded-lg text-xs font-medium flex items-center mb-2">
+                    <i class="fas fa-skull-crossbones mr-2"></i> Account is currently BANNED.
+                </div>`;
+            }
 
-    <!-- Activity Log -->
-    <div class="section-card">
-        <div class="section-title">Recent Activity</div>
+            // Ban/Unban logic
+            const banActionText = customer.status === 'Banned' ? 'Unban Account' : 'Ban Account';
+            const banActionAction = customer.status === 'Banned' ? 'Unban' : 'Ban';
+            const banActionStyle = customer.status === 'Banned' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700';
+            
+            // Card Element setup
+            const cardId = `customer-card-${docId}`;
+            let cardEl = document.createElement('div');
+            cardEl.id = cardId;
+            cardEl.className = 'customer-card p-4 rounded-xl bg-card-light dark:bg-card-dark shadow-lg border border-slate-100 dark:border-slate-800 hover:border-primary transition duration-200';
 
-        <div class="log-item">
-            <div class="log-action">Logged in</div>
-            <div class="log-time">Today 09:42 AM</div>
-        </div>
+            // Subscription Options (Dropdown)
+            const subOptions = SUBSCRIPTION_TIERS.map(tier => 
+                `<option value="${tier}" ${customer.subscription === tier ? 'selected' : ''}>${tier}</option>`
+            ).join('');
 
-        <div class="log-item">
-            <div class="log-action">Updated payment method</div>
-            <div class="log-time">Yesterday 04:14 PM</div>
-        </div>
+            // Activity Log HTML
+            const logHTML = customer.activityLog && customer.activityLog.length > 0 ? 
+                customer.activityLog.slice(0, 3).map(log => 
+                    `<li class="text-xs text-slate-500 dark:text-slate-400 flex justify-between">
+                        <span><i class="fas fa-dot-circle mr-1 text-primary/70"></i> ${log.action}</span>
+                        <span>${formatTimestamp(log.timestamp)}</span>
+                    </li>`
+                ).join('') :
+                `<li class="text-xs text-slate-500 dark:text-slate-400 italic">No recent activity logged.</li>`;
+            
+            // Get note text and last updated info
+            const noteTextContent = customer.note || '';
+            const lastUpdatedText = customer.lastUpdated ? formatTimestamp(customer.lastUpdated) : 'Never';
 
-        <div class="log-item">
-            <div class="log-action">Viewed cloud game settings</div>
-            <div class="log-time">Yesterday 01:55 PM</div>
-        </div>
-    </div>
+            // Update inner HTML
+            cardEl.innerHTML = `
+                ${systemAlertHTML}
+                <div class="flex justify-between items-start mb-4 border-b pb-2 dark:border-slate-700">
+                    <div class="flex items-center">
+                        <span class="text-xl font-bold mr-3">
+                            ${customer.displayName || 'New Customer'}
+                        </span>
+                        <span class="px-2 py-0.5 text-xs font-semibold rounded-full text-white ${statusColor} shadow-md">
+                            ${statusText}
+                        </span>
+                    </div>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">Customer ID: ${customer.userId.substring(0, 8)}...</span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm mb-4">
+                    <!-- Column 1: Core Details -->
+                    <div class="col-span-1 space-y-2">
+                        <h3 class="font-semibold text-primary">Core Details</h3>
+                        <p><i class="fas fa-envelope mr-2 text-primary/70"></i> Email: ${customer.email}</p>
+                        <p><i class="fas fa-clock mr-2 text-primary/70"></i> Joined: ${formatTimestamp(customer.joinedAt)}</p>
+                        <p><i class="fas fa-chart-line mr-2 text-primary/70"></i> Activity Score: <span class="font-medium">${customer.activityScore}</span></p>
+                    </div>
 
-    <!-- Action Buttons -->
-    <div style="padding: 20px;">
-        <button class="action-btn btn-red">Open Live Chat</button>
-        <button class="action-btn btn-outline">Suspend Account</button>
-    </div>
+                    <!-- Column 2: Activity Log -->
+                    <div class="col-span-1 space-y-2">
+                        <h3 class="font-semibold text-primary">Recent Activity</h3>
+                        <ul class="space-y-1">${logHTML}</ul>
+                    </div>
+                    
+                    <!-- Column 3 & 4: CSR Private Notes -->
+                    <div class="col-span-2 space-y-2 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg border dark:border-slate-700">
+                        <h3 class="font-semibold text-primary/80 flex justify-between items-center">
+                            <i class="fas fa-sticky-note mr-2"></i> CSR Private Notes
+                            <span class="text-[10px] text-slate-400">Last updated: ${lastUpdatedText}</span>
+                        </h3>
+                        <textarea id="note-text-${docId}" data-doc-id="${docId}" rows="3" placeholder="Add private notes about this customer..."
+                               class="w-full p-2 text-xs rounded-lg bg-white dark:bg-slate-800 border dark:border-slate-700 focus:ring-primary focus:border-primary">
+${noteTextContent}
+                        </textarea>
+                        <button id="note-save-btn-${docId}" data-doc-id="${docId}"
+                                class="w-full py-1 bg-primary/80 text-white text-xs font-medium rounded-lg hover:bg-primary transition transform active:scale-95 shadow-md">
+                            Save Note
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Action Row -->
+                <div class="flex justify-end items-center space-x-4 pt-3 border-t dark:border-slate-700">
+                    <!-- Subscription Dropdown -->
+                    <div class="flex items-center space-x-2">
+                        <label class="text-xs font-medium whitespace-nowrap">Change Tier:</label>
+                        <select id="sub-select-${docId}" data-doc-id="${docId}"
+                                class="p-2 text-sm rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:ring-primary focus:border-primary">
+                            ${subOptions}
+                        </select>
+                    </div>
+                    
+                    <!-- Ban/Unban Button -->
+                    <button id="ban-btn-${docId}" data-doc-id="${docId}" data-action="${banActionAction}"
+                            class="px-4 py-2 rounded-lg text-white text-sm font-medium ${banActionStyle} transform transition active:scale-95 shadow-md">
+                        <i class="fas fa-gavel mr-2"></i> ${banActionText}
+                    </button>
+                </div>
+            `;
+            
+            // Attach event listeners (Crucial step for interactivity) - Call Mock functions
+            
+            // 1. Ban/Unban Button
+            cardEl.querySelector(`#ban-btn-${docId}`).onclick = (e) => {
+                const action = e.currentTarget.getAttribute('data-action');
+                mockUpdate(`${action} Account`, docId);
+            };
 
-</div>
+            // 2. Subscription Select
+            cardEl.querySelector(`#sub-select-${docId}`).onchange = () => {
+                mockUpdate(`Change Tier`, docId);
+            };
+
+            // 3. CSR Note Save Button
+            cardEl.querySelector(`#note-save-btn-${docId}`).onclick = () => {
+                mockUpdate(`Save Note`, docId);
+            };
+
+            return cardEl;
+        }
+
+        // --- Filtering Logic ---
+        function filterCustomers() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const container = document.getElementById('customer-list-container');
+            container.innerHTML = ''; // Clear current list
+
+            const filtered = allCustomers.filter(customer => {
+                // Combine relevant fields for searching
+                const searchableText = `${customer.userId} ${customer.email} ${customer.subscription} ${customer.displayName || ''} ${customer.status}`.toLowerCase();
+                return searchableText.includes(searchTerm);
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center p-8 text-slate-500 dark:text-slate-400">No customers found matching your search.</div>`;
+            } else {
+                filtered.forEach(customer => {
+                    const card = renderCustomerCard(customer);
+                    container.appendChild(card);
+                });
+            }
+        }
+
+        // --- Init ---
+        function init() {
+            allCustomers = getMockCustomers(); // Load mock data
+            filterCustomers(); // Display all customers
+            
+            // Attach event listener for search input
+            document.getElementById('search-input').addEventListener('input', filterCustomers);
+            
+            showToast("UI Loaded Successfully. Backend (Firebase) connection is DISABLED.", "info");
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
