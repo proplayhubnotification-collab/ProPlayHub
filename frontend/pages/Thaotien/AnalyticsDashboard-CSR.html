@@ -1,251 +1,207 @@
-<!-- Design prototype is optimized for Google Pixel 7. -->
+<!-- This prototype is highly optimized for mobile devices (max-width: 420px) and replaces the large trend chart with a compact Doughnut chart to eliminate vertical scrolling. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <!-- Critical for mobile-first design: ensures content scales correctly -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <!-- App Name and Description -->
-    <meta name="application-name" content="ProPlay Hub">
-    <meta name="description" content="ProPlay Hub Dashboard Prototype for CSR and Management teams.">
-
-    <!-- Theme Color (Status Bar, Taskbar, etc.) -->
-    <!-- Light Mode Background Color: #f8fafc | Dark Mode Background Color: #020618 -->
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc">
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020618">
-
-    <!-- iOS Configuration -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="ProPlay Hub">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-
-    <!-- Windows Configuration -->
-    <meta name="msapplication-TileColor" content="#020618">
-    <title>Welcome back ProPlayHub</title>
+    
+    <title>Mobile Mini Dashboard</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <!-- Chart.js for the compact Doughnut visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 
     <script>
-        // Tailwind Configuration with required colors and border radius
+        // Tailwind Configuration
         tailwind.config = {
-            darkMode: 'class', // Using 'class' for theme-toggle functionality
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
                         'primary': '#ec003f', // Main color: Red/Pink
-                        'dark-bg': '#020618', // Dark Mode Background
-                        'light-bg': '#f8fafc', // Light Mode Background
-                        'dark-text': '#f8fafc', // Dark Mode Text
-                        'light-text': '#020618', // Light Mode Text
-                        // Card background slightly darker than overall Dark Mode background
+                        'dark-bg': '#020618',
+                        'light-bg': '#f8fafc',
                         'card-dark': '#0c1221', 
                     },
                     borderRadius: {
-                        'lg': '0.375rem', // Fixed 0.375rem radius
+                        'lg': '0.375rem',
                     }
                 }
             }
         }
     </script>
     <style>
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        /* Toast animation for notifications */
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        .toast-slide-in { animation: slideIn 0.3s ease-out forwards; }
+        .toast-slide-out { animation: slideOut 0.3s ease-in forwards; }
+        
+        /* Ensure the main content container is compact and centered */
+        main {
+            padding-bottom: 20px; 
+            /* Force narrow width for mobile appearance */
+            max-width: 420px; 
+            margin-left: auto;
+            margin-right: auto;
         }
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
+
+        /* Prevent the list from causing double scrolling on mobile */
+        #customer-list-container {
+            max-height: none; 
+            overflow-y: hidden;
         }
-        .toast-slide-in {
-            animation: slideIn 0.3s ease-out forwards;
-        }
-        .toast-slide-out {
-            animation: slideOut 0.3s ease-in forwards;
-        }
-        /* Custom scrollbar for Dark Mode */
-        .overflow-x-auto::-webkit-scrollbar {
-            height: 8px;
-        }
-        .overflow-x-auto::-webkit-scrollbar-thumb {
-            background-color: #ec003f; /* Primary color */
-            border-radius: 4px;
-        }
-        .dark .overflow-x-auto::-webkit-scrollbar-track {
-            background-color: #020618; /* Dark Mode Background */
-        }
-        .light .overflow-x-auto::-webkit-scrollbar-track {
-            background-color: #f8fafc; /* Light Mode Background */
+
+        /* Hide table elements not essential for mobile view */
+        .mobile-hidden-md {
+            display: none !important;
         }
     </style>
 </head>
-<!-- Adjust body to use colors from new tailwind config -->
-<body class="bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text transition-colors duration-300">
-    <main class="min-h-screen p-4 sm:p-6 pb-20 max-w-7xl mx-auto">
-    <!-- Toast Alert Container -->
-        <div id="toast-container" class="fixed top-4 right-4 text-sm z-50">
 
-        </div>
+<body class="bg-light-bg text-gray-900 dark:bg-dark-bg dark:text-slate-100 transition-colors duration-300">
+    <!-- Main mobile-focused container -->
+    <main class="min-h-screen p-4">
+        <!-- Toast Alert Container -->
+        <div id="toast-container" class="fixed top-4 right-4 text-sm z-50"></div>
 
-        <!-- Start code section -->
-        
-        <!-- Header, Notifications, and Theme Toggle -->
-        <header class="flex justify-between items-center mb-6 border-b border-primary/20 pb-4">
+        <!-- Header, Notifications, and Theme Toggle (Mobile optimized) -->
+        <header class="flex justify-between items-center mb-6 pb-3 border-b border-primary/20">
             <div class="flex flex-col">
-                <h1 class="text-3xl sm:text-4xl font-extrabold text-primary">ProPlay Hub</h1>
-                <p class="text-sm text-slate-500 dark:text-slate-400">Master Prototype Interface</p>
+                <h1 class="text-3xl font-extrabold text-primary">ProPlay Hub</h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Mobile Mini Dashboard</p>
             </div>
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-3">
                 
                 <!-- US22: Targeted Offers Mockup (Notification Badge) -->
-                <button id="offer-btn" class="p-2 rounded-lg bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text relative hover:bg-primary/10 transition duration-300">
+                <button id="offer-btn" class="p-2 rounded-lg relative hover:bg-primary/10 transition duration-300" title="Targeted Offers (US22)">
                     <i class="fas fa-bell text-xl"></i>
-                    <!-- Badge uses primary color -->
                     <span id="notification-badge" class="absolute top-0 right-0 h-3 w-3 rounded-full bg-primary border-2 border-light-bg dark:border-dark-bg transition-opacity duration-300"></span>
                 </button>
 
-                <button id="theme-toggle" class="p-2 rounded-lg bg-light-bg dark:bg-dark-bg hover:bg-slate-200 dark:hover:bg-slate-800 transition duration-300 border border-slate-300 dark:border-slate-700">
-                    <!-- Icon for Dark/Light mode -->
+                <button id="theme-toggle" class="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition duration-300 border border-slate-300 dark:border-slate-700" title="Toggle Light/Dark Mode">
                     <i class="fas fa-sun dark:hidden text-yellow-500 text-lg"></i>
-                    <i class="fas fa-moon hidden dark:block text-dark-text text-lg"></i>
+                    <i class="fas fa-moon hidden dark:block text-slate-100 text-lg"></i>
                 </button>
             </div>
         </header>
 
-        <!-- Main Content Grid -->
-        <div class="space-y-8">
+        <!-- Main Content (Reduced density) -->
+        <div class="space-y-6">
             
-            <!-- 1. Analytics Dashboard (US24) -->
-            <section class="space-y-6">
-                <h2 class="text-2xl font-semibold border-l-4 border-primary pl-3">Analytics Dashboard (US24)</h2>
+            <!-- 1. Analytics Dashboard (US24) - KPI Metrics Cards (Compact 2x2 grid) -->
+            <section class="space-y-4">
+                <h2 class="text-xl font-semibold border-l-4 border-primary pl-3">Analytics Summary (US24)</h2>
                 
-                <!-- KPI Metrics Cards -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 gap-3">
                     <!-- Card 1: Active Users -->
-                    <div class="bg-white dark:bg-card-dark p-4 rounded-lg shadow-xl flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] border border-primary/20">
-                        <div class="text-primary mb-2"><i class="fas fa-users fa-xl"></i></div>
-                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Active Customers</p>
-                        <p id="kpi-active-users" class="text-3xl font-extrabold text-light-text dark:text-dark-text mt-1">1,560</p>
-                        <p class="text-xs text-green-500 mt-1">+5.2% (Week)</p>
+                    <div class="bg-white dark:bg-card-dark p-3 rounded-lg shadow-lg transition-all duration-300 border border-primary/20">
+                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Customers</p>
+                        <p id="kpi-active-users" class="text-2xl font-extrabold text-primary mt-1">1,560</p>
+                        <p class="text-xs text-green-500 mt-1">+5.2%</p>
                     </div>
 
                     <!-- Card 2: Subscription Revenue -->
-                    <div class="bg-white dark:bg-card-dark p-4 rounded-lg shadow-xl flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] border border-primary/20">
-                        <div class="text-primary mb-2"><i class="fas fa-dollar-sign fa-xl"></i></div>
-                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Subscription Revenue</p>
-                        <p id="kpi-revenue" class="text-3xl font-extrabold text-light-text dark:text-dark-text mt-1">$120K</p>
-                        <p class="text-xs text-primary mt-1">+10% (Month)</p>
+                    <div class="bg-white dark:bg-card-dark p-3 rounded-lg shadow-lg transition-all duration-300 border border-primary/20">
+                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Revenue</p>
+                        <p id="kpi-revenue" class="text-2xl font-extrabold text-primary mt-1">$120K</p>
+                        <p class="text-xs text-primary mt-1">+10%</p>
                     </div>
 
                     <!-- Card 3: Churn Rate -->
-                    <div class="bg-white dark:bg-card-dark p-4 rounded-lg shadow-xl flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] border border-primary/20">
-                        <div class="text-primary mb-2"><i class="fas fa-sync-alt fa-xl"></i></div>
+                    <div class="bg-white dark:bg-card-dark p-3 rounded-lg shadow-lg transition-all duration-300 border border-primary/20">
                         <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Churn Rate</p>
-                        <p id="kpi-churn" class="text-3xl font-extrabold text-light-text dark:text-dark-text mt-1">1.8%</p>
+                        <p id="kpi-churn" class="text-2xl font-extrabold text-gray-900 dark:text-slate-100 mt-1">1.8%</p>
                         <p class="text-xs text-yellow-500 mt-1">Stable</p>
                     </div>
 
-                    <!-- Card 4: ProPlayer Plan Penetration -->
-                    <div class="bg-white dark:bg-card-dark p-4 rounded-lg shadow-xl flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] border border-primary/20 cursor-pointer" title="Click to simulate Share (US23)">
-                        <div class="text-primary mb-2"><i class="fas fa-crown fa-xl"></i></div>
-                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">ProPlayer Penetration</p>
-                        <p id="kpi-proplayer" class="text-3xl font-extrabold text-light-text dark:text-dark-text mt-1">35%</p>
-                        <p class="text-xs text-green-500 mt-1">Target $30\%</p>
+                    <!-- Card 4: Average CSAT -->
+                    <div class="bg-white dark:bg-card-dark p-3 rounded-lg shadow-lg transition-all duration-300 border border-primary/20 cursor-pointer" title="Click to simulate Social Share (US23)">
+                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Avg CSAT</p>
+                        <p id="kpi-csat" class="text-2xl font-extrabold text-gray-900 dark:text-slate-100 mt-1">4.7/5</p>
+                        <p class="text-xs text-green-500 mt-1">Excellent</p>
                     </div>
                 </div>
 
-                <!-- Chart Visualization (Mock Line Chart) -->
-                <div class="bg-white dark:bg-card-dark p-4 rounded-lg shadow-xl border border-primary/20">
-                    <h3 class="text-lg font-medium mb-4">Active User Growth (6 Months)</h3>
-                    <canvas id="userGrowthChart" class="w-full h-64"></canvas>
+                <!-- Chart Visualization: Compact Doughnut Chart for Plan Penetration (Replaces large line chart) -->
+                <div class="bg-white dark:bg-card-dark p-3 rounded-lg shadow-lg border border-primary/20">
+                    <h3 class="text-base font-medium mb-3">ProPlayer Plan Penetration</h3>
+                    <div class="w-full max-w-xs mx-auto h-48 flex items-center justify-center">
+                        <canvas id="planPenetrationChart" class="w-full h-full"></canvas>
+                    </div>
                 </div>
             </section>
 
-            <!-- 2. Customer Management & CSR Filtering (US26) -->
-            <section class="bg-white dark:bg-card-dark p-4 sm:p-6 rounded-lg shadow-xl border border-primary/20">
-                <h2 class="text-2xl font-semibold mb-4 border-l-4 border-primary pl-3">Customer Management (US26 - Advanced Filtering)</h2>
+            <!-- 2. Customer Management & CSR Filtering (US26) - Simplified for Mobile -->
+            <section class="bg-white dark:bg-card-dark p-3 rounded-lg shadow-lg border border-primary/20">
+                <h2 class="text-xl font-semibold mb-3 border-l-4 border-primary pl-3">Recent Customers (US26)</h2>
 
-                <!-- Search and Filter Bar -->
-                <div class="flex flex-col sm:flex-row gap-4 mb-4">
-                    <div class="relative flex-grow">
-                        <input type="text" id="customer-search" placeholder="Search by Name or Customer ID..." class="w-full p-3 pl-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-light-bg dark:bg-dark-bg focus:ring-primary focus:border-primary transition duration-150 text-sm">
-                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                <!-- Search and Filter Bar (Stacked/Simplified) -->
+                <div class="flex flex-col gap-2 mb-3">
+                    <div class="relative w-full">
+                        <input type="text" id="customer-search" placeholder="Quick search..." class="w-full p-2 pl-8 rounded-lg border border-slate-300 dark:border-slate-700 bg-light-bg dark:bg-dark-bg focus:ring-primary focus:border-primary text-sm">
+                        <i class="fas fa-search absolute left-2 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
                     </div>
                     
-                    <select id="customer-filter-subscription" class="p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-light-bg dark:bg-dark-bg w-full sm:w-48 text-sm focus:ring-primary focus:border-primary">
-                        <option value="all">All Plans</option>
-                        <option value="ProPlayer">ProPlayer</option>
-                        <option value="Basic">Basic</option>
-                        <option value="Premium">Premium</option>
-                        <option value="Trial">Trial</option>
-                    </select>
-                    
-                    <select id="customer-filter-status" class="p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-light-bg dark:bg-dark-bg w-full sm:w-48 text-sm focus:ring-primary focus:border-primary">
-                        <option value="all">All Status</option>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                    </select>
+                    <div class="grid grid-cols-2 gap-2">
+                         <select id="customer-filter-subscription" class="p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-light-bg dark:bg-dark-bg text-sm focus:ring-primary focus:border-primary">
+                            <option value="all">All Plans</option>
+                            <option value="ProPlayer">ProPlayer</option>
+                            <option value="Basic">Basic</option>
+                            <option value="Trial">Trial</option>
+                        </select>
+                        
+                        <select id="customer-filter-status" class="p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-light-bg dark:bg-dark-bg text-sm focus:ring-primary focus:border-primary">
+                            <option value="all">All Statuses</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Customer Table -->
-                <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
+                <!-- Customer Table - No fixed max-height to avoid double scrolling -->
+                <div id="customer-list-container" class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
                     <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                        <thead class="bg-slate-50 dark:bg-slate-700/50">
+                        <thead class="bg-slate-50 dark:bg-slate-700/50 sticky top-0">
                             <tr>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden sm:table-cell">ID</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">Name/Plan</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">Status</th>
-                                <th class="px-3 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden md:table-cell">Last Active</th>
-                                <th class="px-3 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">CSAT</th>
-                                <th class="px-3 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">Action</th>
+                                <!-- Removed non-essential columns for mobile width -->
+                                <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">Name/Plan</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">Status</th>
+                                <th class="px-3 py-2 text-right text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider mobile-hidden-md">CSAT</th>
+                                <th class="px-3 py-2 text-right text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
                         <tbody id="customer-list" class="bg-white dark:bg-card-dark divide-y divide-slate-200 dark:divide-slate-700">
                             <tr>
-                                <td colspan="6" class="text-center p-8 text-slate-500 dark:text-slate-400">Loading customer data...</td>
+                                <td colspan="4" class="text-center p-6 text-slate-500 dark:text-slate-400">Loading customer data...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <p id="no-results" class="text-center text-slate-500 dark:text-slate-400 mt-4 hidden">No customers found matching the criteria.</p>
+                <p id="no-results" class="text-center text-slate-500 dark:text-slate-400 mt-3 hidden text-sm">No customers found.</p>
             </section>
         </div>
 
         <!-- Social Share Pop-up (US23 Mockup) -->
-        <div id="share-modal" class="fixed inset-0 bg-light-text/70 dark:bg-dark-bg/80 hidden items-center justify-center z-50 transition-opacity duration-300">
-            <div class="bg-white dark:bg-card-dark p-6 rounded-lg shadow-2xl w-full max-w-sm border border-primary/40">
+        <div id="share-modal" class="fixed inset-0 bg-gray-900/70 dark:bg-dark-bg/80 hidden items-center justify-center z-50 transition-opacity duration-300">
+            <div class="bg-white dark:bg-card-dark p-6 rounded-lg shadow-2xl w-full max-w-xs border border-primary/40">
                 <h3 class="text-xl font-bold mb-4 text-primary">Share Achievement (US23)</h3>
-                <p class="mb-4 text-sm text-slate-600 dark:text-slate-300">You've unlocked the **"Legendary Player"** badge! Share this achievement now!</p>
+                <p class="mb-4 text-sm text-slate-600 dark:text-slate-300">You unlocked the **"Legendary Player"** badge!</p>
                 <div class="flex flex-col space-y-3">
-                    <!-- Share Button 1 -->
-                    <button class="flex items-center justify-center w-full p-3 rounded-lg bg-[#1DA1F2] text-white font-semibold hover:opacity-90 transition duration-150">
-                        <i class="fab fa-twitter mr-2"></i> Share on X (Twitter)
+                    <button class="flex items-center justify-center w-full p-3 rounded-lg bg-[#1DA1F2] text-white font-semibold hover:opacity-90 transition duration-150 text-sm">
+                        <i class="fab fa-twitter mr-2"></i> Share to X
                     </button>
-                    <!-- Share Button 2 -->
-                    <button class="flex items-center justify-center w-full p-3 rounded-lg bg-[#5865F2] text-white font-semibold hover:opacity-90 transition duration-150">
-                        <i class="fab fa-discord mr-2"></i> Share on Discord
+                    <button class="flex items-center justify-center w-full p-3 rounded-lg bg-[#5865F2] text-white font-semibold hover:opacity-90 transition duration-150 text-sm">
+                        <i class="fab fa-discord mr-2"></i> Share to Discord
                     </button>
-                    <!-- Close Button -->
-                    <button id="close-share-modal" class="w-full p-3 rounded-lg bg-slate-200 dark:bg-slate-700 text-light-text dark:text-dark-text font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition duration-150">
+                    <button id="close-share-modal" class="w-full p-3 rounded-lg bg-slate-200 dark:bg-slate-700 text-gray-900 dark:text-slate-100 font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition duration-150 text-sm">
                         Close
                     </button>
                 </div>
             </div>
         </div>
-
-    <!-- End code section -->
     </main>
 
     <!-- Scripts -->
@@ -253,7 +209,7 @@
         // --- Firebase & Auth Setup (MANDATORY) ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // Global variables from Canvas environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -264,16 +220,13 @@
         let currentUserId = null;
         let isAuthReady = false;
 
-        // Mock Data
+        // Mock Data: Limited to five entries for compact mobile display
         const mockCustomers = [
-            { id: 'usr_001', name: 'John Doe', subscription: 'ProPlayer', status: 'Active', lastActivity: '2 hours ago', csat: 4.8 },
-            { id: 'usr_002', name: 'Jane Smith', subscription: 'Trial', status: 'Active', lastActivity: '1 day ago', csat: 3.5 },
-            { id: 'usr_003', name: 'Ethan Lee', subscription: 'Premium', status: 'Active', lastActivity: '5 minutes ago', csat: 5.0 },
-            { id: 'usr_004', name: 'Priya Sharma', subscription: 'ProPlayer', status: 'Inactive', lastActivity: '2 weeks ago', csat: 4.1 },
-            { id: 'usr_005', name: 'Alex Wong', subscription: 'Basic', status: 'Active', lastActivity: '1 hour ago', csat: 4.9 },
-            { id: 'usr_006', name: 'Sophie Duong', subscription: 'Trial', status: 'Active', lastActivity: '3 days ago', csat: 4.2 },
-            { id: 'usr_007', name: 'Michael G', subscription: 'ProPlayer', status: 'Active', lastActivity: '10 minutes ago', csat: 4.9 },
-            { id: 'usr_008', name: 'Olivia H', subscription: 'Basic', status: 'Inactive', lastActivity: '3 months ago', csat: 3.0 },
+            { id: 'usr_001', name: 'John Doe', subscription: 'ProPlayer', status: 'Active', csat: 4.8 },
+            { id: 'usr_002', name: 'Jane Smith', subscription: 'Trial', status: 'Active', csat: 3.5 },
+            { id: 'usr_003', name: 'Leo Carter', subscription: 'Premium', status: 'Active', csat: 5.0 },
+            { id: 'usr_004', name: 'Paul Brown', subscription: 'Basic', status: 'Inactive', csat: 4.1 },
+            { id: 'usr_005', name: 'Helen Lee', subscription: 'ProPlayer', status: 'Active', csat: 4.9 },
         ];
 
         // --- Utility Functions ---
@@ -300,8 +253,7 @@
                     icon = '<i class="fas fa-info-circle mr-2"></i>';
                     break;
                 case 'offer':
-                    // US22: Offer uses primary color
-                    classes += ' bg-primary text-dark-text font-bold'; 
+                    classes += ' bg-primary text-white font-bold'; 
                     icon = '<i class="fas fa-gift mr-2"></i>';
                     break;
                 default:
@@ -326,14 +278,14 @@
         }
 
         /** Get Badge class based on status/subscription */
-        function getStatusBadge(text) {
+        function getBadgeClass(text) {
             let classes = 'text-xs font-semibold px-2 py-0.5 rounded-full inline-flex items-center ';
             switch (text) {
                 case 'Active':
                     classes += 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
                     break;
                 case 'ProPlayer':
-                    classes += 'bg-primary/20 text-primary dark:bg-primary/40 dark:text-dark-text'; 
+                    classes += 'bg-primary/20 text-primary dark:bg-primary/40 dark:text-slate-100'; 
                     break;
                 case 'Premium':
                     classes += 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
@@ -368,25 +320,23 @@
                 row.className = 'hover:bg-slate-50 dark:hover:bg-slate-800 transition duration-150';
                 
                 const csatColor = customer.csat >= 4.5 ? 'text-green-500' : (customer.csat >= 3.5 ? 'text-yellow-500' : 'text-red-500');
-                const csatIcon = customer.csat >= 4.5 ? '<i class="fas fa-star mr-1"></i>' : '<i class="fas fa-star-half-alt mr-1"></i>';
+                const csatIcon = customer.csat >= 4.5 ? '<i class="fas fa-star text-xs mr-1"></i>' : '<i class="fas fa-star-half-alt text-xs mr-1"></i>';
+
 
                 row.innerHTML = `
-                    <td class="px-3 py-3 text-sm font-mono text-slate-500 dark:text-slate-400 hidden sm:table-cell">${customer.id}</td>
-                    <td class="px-3 py-3 text-sm font-medium text-light-text dark:text-dark-text">
+                    <td class="px-3 py-2 text-sm font-medium text-gray-900 dark:text-slate-100">
                         <span class="block">${customer.name}</span>
-                        <span class="${getStatusBadge(customer.subscription)} mt-1">${customer.subscription}</span>
-                        <span class="block text-xs text-slate-500 dark:text-slate-400 sm:hidden mt-1">ID: ${customer.id}</span>
+                        <span class="${getBadgeClass(customer.subscription)} mt-1">${customer.subscription}</span>
                     </td>
-                    <td class="px-3 py-3">
-                        <span class="${getStatusBadge(customer.status)}">${customer.status}</span>
+                    <td class="px-3 py-2">
+                        <span class="${getBadgeClass(customer.status)} text-xs">${customer.status}</span>
                     </td>
-                    <td class="px-3 py-3 text-sm text-slate-500 dark:text-slate-400 text-right hidden md:table-cell">${customer.lastActivity}</td>
-                    <td class="px-3 py-3 text-sm font-bold text-right ${csatColor} flex items-center justify-end">
+                    <td class="px-3 py-2 text-xs font-bold text-right ${csatColor} flex items-center justify-end mobile-hidden-md">
                         ${csatIcon} ${customer.csat}
                     </td>
-                    <td class="px-3 py-3 text-right">
-                        <button data-id="${customer.id}" class="btn-view-customer text-primary hover:text-primary/80 font-medium text-sm transition duration-150 p-1 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/30">
-                            <i class="fas fa-headset"></i> <span class="hidden sm:inline">Support</span>
+                    <td class="px-3 py-2 text-right">
+                        <button data-id="${customer.id}" class="btn-view-customer text-primary hover:text-primary/80 font-medium text-xs transition duration-150 p-1 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/30">
+                            <i class="fas fa-headset"></i> Support
                         </button>
                     </td>
                 `;
@@ -396,7 +346,7 @@
             document.querySelectorAll('.btn-view-customer').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const customerId = e.currentTarget.dataset.id;
-                    showToast(`Starting support session with: ${customerId}`, 'info');
+                    showToast(`Starting support session for: ${customerId}`, 'info');
                 });
             });
         }
@@ -408,6 +358,7 @@
             const filterStatus = document.getElementById('customer-filter-status').value;
 
             const filtered = mockCustomers.filter(customer => {
+                // Search by name or ID
                 const matchesSearch = customer.name.toLowerCase().includes(searchText) || customer.id.toLowerCase().includes(searchText);
                 
                 const matchesSubscription = filterSubscription === 'all' || customer.subscription === filterSubscription;
@@ -420,51 +371,55 @@
             renderCustomerList(filtered);
         }
 
-        /** Initialize Chart (US24) */
+        /** Initialize Doughnut Chart (US24) - Compact version for Plan Penetration */
         function initChart() {
-            const ctx = document.getElementById('userGrowthChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
+            const ctx = document.getElementById('planPenetrationChart').getContext('2d');
+            // Destroy existing chart instance if it exists
+            if (window.planPenetrationChartInstance) {
+                window.planPenetrationChartInstance.destroy();
+            }
+            
+            // Data for ProPlayer (35%) vs. Other Plans (65%)
+            const proPlayerPenetration = 35; 
+            const otherPlans = 100 - proPlayerPenetration;
+            
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            const primaryColor = '#ec003f';
+            const secondaryColor = isDarkMode ? '#1e293b' : '#cbd5e1';
+            const textColor = isDarkMode ? '#f8fafc' : '#020618';
+
+            window.planPenetrationChartInstance = new Chart(ctx, {
+                type: 'doughnut',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    labels: ['ProPlayer', 'Other Plans'],
                     datasets: [{
-                        label: 'Active Users Count',
-                        data: [1200, 1350, 1400, 1500, 1560, 1680],
-                        borderColor: '#ec003f', // Primary color
-                        backgroundColor: 'rgba(236, 0, 63, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
+                        data: [proPlayerPenetration, otherPlans],
+                        backgroundColor: [
+                            primaryColor,
+                            secondaryColor
+                        ],
+                        hoverOffset: 4,
+                        borderWidth: 1,
+                        borderColor: isDarkMode ? '#0c1221' : '#ffffff',
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    cutout: '70%', // Make it a doughnut
                     plugins: {
                         legend: {
+                            position: 'bottom',
                             labels: {
-                                // Ensure chart text color is theme compatible
-                                color: document.documentElement.classList.contains('dark') ? '#f8fafc' : '#020618'
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: document.documentElement.classList.contains('dark') ? '#1e293b' : '#f0f4f8'
-                            },
-                            ticks: {
-                                color: document.documentElement.classList.contains('dark') ? '#f8fafc' : '#020618'
+                                color: textColor,
+                                font: { size: 12 }
                             }
                         },
-                        x: {
-                            grid: {
-                                color: document.documentElement.classList.contains('dark') ? '#1e293b' : '#f0f4f8'
-                            },
-                            ticks: {
-                                color: document.documentElement.classList.contains('dark') ? '#f8fafc' : '#020618'
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + '%';
+                                }
                             }
                         }
                     }
@@ -511,7 +466,7 @@
 
             } catch (error) {
                 console.error("Error initializing Firebase or signing in:", error);
-                showToast(`Auth Error: ${error.message}`, 'error');
+                showToast(`Authentication Error: ${error.message}`, 'error');
                 isAuthReady = true; 
                 setupListeners();
                 initChart();
@@ -549,7 +504,8 @@
                 document.documentElement.classList.add('dark');
                 localStorage.setItem('theme', 'dark');
             }
-            // In a real environment, you would re-initialize the chart here to update colors.
+            // Re-initialize chart to update colors based on new theme
+            initChart();
         });
 
         // --- US23 & US22 Event Handlers ---
@@ -565,10 +521,10 @@
         });
 
         // US23: Social Share Mockup
-        document.getElementById('kpi-proplayer').addEventListener('click', () => {
+        document.querySelector('[title="Click to simulate Social Share (US23)"]').addEventListener('click', () => {
             document.getElementById('share-modal').classList.remove('hidden');
             document.getElementById('share-modal').classList.add('flex');
-            showToast('Opening Achievement Share Pop-up (US23)', 'info');
+            showToast('Opening Achievement Share window (US23)', 'info');
         });
 
         document.getElementById('close-share-modal').addEventListener('click', () => {
