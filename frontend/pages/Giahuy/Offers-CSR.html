@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Your Offers - ProPlay Hub</title>
+    
+    <!-- Meta Theme Color -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020618">
+
+    <!-- Icons & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Configuration -->
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['"Be Vietnam Pro"', 'sans-serif'],
+                },
+                colors: {
+                    brand: '#ec003f',
+                    slate: {
+                        50: '#f8fafc',
+                        950: '#020618',
+                    }
+                },
+                borderRadius: {
+                    DEFAULT: '0.375rem',
+                    'card': '1rem',
+                    'input': '0.5rem'
+                },
+                boxShadow: {
+                    'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    'glow': '0 0 15px rgba(236, 0, 63, 0.3)'
+                }
+            }
+        }
+      }
+    </script>
+
+    <style>
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        .toast-slide-in { animation: slideIn 0.3s ease-out forwards; }
+        .toast-slide-out { animation: slideOut 0.3s ease-in forwards; }
+        
+        /* Coupon Border Effect */
+        .coupon-border {
+            mask-image: radial-gradient(circle at 10px center, transparent 10px, black 10px);
+            mask-position: -10px center;
+            mask-size: 100% 100%;
+            -webkit-mask-image: radial-gradient(circle at 0px 10px, transparent 0, black 0); /* Fallback simplified */
+        }
+        
+        /* Dashed Divider */
+        .dashed-divider {
+            background-image: linear-gradient(to bottom, #cbd5e1 50%, transparent 50%);
+            background-size: 2px 10px;
+            background-repeat: repeat-y;
+        }
+        .dark .dashed-divider {
+            background-image: linear-gradient(to bottom, #334155 50%, transparent 50%);
+        }
+
+        body { -webkit-tap-highlight-color: transparent; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300 min-h-screen flex flex-col font-sans">
+
+    <main class="mx-auto w-full max-w-md bg-transparent pb-8 relative z-0">
+        <!-- Toast Container -->
+        <div id="toast-container" class="fixed top-4 right-4 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+
+        <!-- Header -->
+        <header class="px-5 pt-12 pb-4 flex justify-between items-center sticky top-0 z-10 backdrop-blur-md bg-slate-50/90 dark:bg-slate-950/90 border-b border-gray-200/50 dark:border-gray-800/50">
+            <button onclick="history.back()" class="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                <i class="fas fa-arrow-left text-lg"></i>
+            </button>
+            <h1 class="text-lg font-bold">Your Offers</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="px-4 py-6 space-y-4" id="offers-list">
+            <!-- Offers will be injected here via JS -->
+        </div>
+
+        <!-- Empty State (Hidden by default) -->
+        <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-center">
+            <div class="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-ticket text-3xl text-gray-300 dark:text-gray-600"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">No offers available</h3>
+            <p class="text-sm text-gray-500 mt-1 max-w-[200px]">Check back later for exclusive deals!</p>
+        </div>
+
+    </main>
+
+    <!-- Scripts -->
+    <script>
+        // Sample Gaming Offers Data
+        const offers = [
+            { 
+                id: 'OFR-01', 
+                title: '20% Off Top-up', 
+                description: 'Valid for first time Diamond top-up via ProPlay.',
+                code: 'NEWPLAYER20', 
+                expires: '2025-12-31', 
+                icon: 'fa-gem',
+                color: 'text-blue-500',
+                bg: 'bg-blue-50 dark:bg-blue-900/20',
+                applied: false 
+            },
+            { 
+                id: 'OFR-02', 
+                title: '$5 Off Skin Voucher', 
+                description: 'Save $5 on any Legendary Skin purchase.',
+                code: 'SKINMASTER', 
+                expires: '2025-11-30', 
+                icon: 'fa-shirt',
+                color: 'text-purple-500',
+                bg: 'bg-purple-50 dark:bg-purple-900/20',
+                applied: false 
+            },
+            { 
+                id: 'OFR-03', 
+                title: 'Free Shipping (Cards)', 
+                description: 'Free delivery for physical Garena/Zing cards.',
+                code: 'FREESHIP', 
+                expires: '2025-10-15', 
+                icon: 'fa-truck-fast',
+                color: 'text-green-500',
+                bg: 'bg-green-50 dark:bg-green-900/20',
+                applied: true 
+            },
+            { 
+                id: 'OFR-04', 
+                title: '10% Bonus Points', 
+                description: 'Get extra points when buying Battle Pass.',
+                code: 'BONUS10', 
+                expires: '2025-12-01', 
+                icon: 'fa-coins',
+                color: 'text-yellow-500',
+                bg: 'bg-yellow-50 dark:bg-yellow-900/20',
+                applied: false 
+            }
+        ];
+
+        // --- Render Logic ---
+        function renderOffers() {
+            const container = document.getElementById('offers-list');
+            const emptyState = document.getElementById('empty-state');
+            container.innerHTML = '';
+
+            if (offers.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+            } else {
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+
+                offers.forEach(o => {
+                    const btnClass = o.applied 
+                        ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed' 
+                        : 'bg-brand text-white shadow-glow hover:bg-red-700 active:scale-95';
+                    
+                    const btnText = o.applied ? 'Applied' : 'Apply';
+
+                    const card = document.createElement('div');
+                    card.className = 'bg-white dark:bg-[#0f172a] rounded-card shadow-soft border border-gray-100 dark:border-gray-800 overflow-hidden flex animate-fade-in relative group';
+                    
+                    card.innerHTML = `
+                        <!-- Left Icon Part -->
+                        <div class="w-24 p-4 flex flex-col items-center justify-center border-r border-dashed border-gray-200 dark:border-gray-700 relative">
+                            <div class="w-12 h-12 rounded-full ${o.bg} ${o.color} flex items-center justify-center text-xl mb-2">
+                                <i class="fas ${o.icon}"></i>
+                            </div>
+                            <div class="absolute -top-3 -right-3 w-6 h-6 bg-slate-50 dark:bg-slate-950 rounded-full z-10"></div>
+                            <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-slate-50 dark:bg-slate-950 rounded-full z-10"></div>
+                        </div>
+
+                        <!-- Right Content Part -->
+                        <div class="flex-1 p-4 pl-5 flex flex-col justify-center min-w-0">
+                            <div class="flex justify-between items-start mb-1">
+                                <h3 class="font-bold text-sm truncate pr-2">${o.title}</h3>
+                                ${o.applied ? '<span class="text-[10px] bg-gray-100 text-gray-500 dark:bg-gray-800 px-2 py-0.5 rounded-full font-bold uppercase">Used</span>' : ''}
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 leading-tight mb-3 line-clamp-2">${o.description}</p>
+                            
+                            <!-- Code & Actions -->
+                            <div class="flex items-center justify-between bg-gray-50 dark:bg-slate-900 rounded-lg p-2 border border-gray-100 dark:border-gray-700">
+                                <code class="font-mono text-xs font-bold text-gray-700 dark:text-gray-300 tracking-wider">${o.code}</code>
+                                <div class="flex gap-2">
+                                    <button onclick="copyToClipboard('${o.code}')" class="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-slate-800 text-gray-500 hover:text-brand transition-colors shadow-sm" title="Copy Code">
+                                        <i class="fas fa-copy text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-end mt-3">
+                                <span class="text-[10px] text-gray-400">Exp: ${new Date(o.expires).toLocaleDateString()}</span>
+                                <button onclick="${!o.applied ? `applyOffer('${o.id}')` : ''}" class="text-xs font-bold px-4 py-1.5 rounded-full transition-all ${btnClass}">
+                                    ${btnText}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+        }
+
+        // --- Actions ---
+        function copyToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast(`Code ${text} copied!`, 'success');
+                });
+            } else {
+                // Fallback
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand("Copy");
+                textArea.remove();
+                showToast(`Code ${text} copied!`, 'success');
+            }
+        }
+
+        function applyOffer(id) {
+            const offer = offers.find(o => o.id === id);
+            if (offer) {
+                // Simulate API Call
+                showToast(`Applying ${offer.code}...`);
+                setTimeout(() => {
+                    offer.applied = true;
+                    renderOffers(); // Re-render to update UI
+                    showToast('Voucher applied successfully!', 'success');
+                }, 800);
+            }
+        }
+
+        // --- Toast Utility ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let icon = 'fa-info-circle';
+            let color = 'text-brand';
+            if (type === 'success') { icon = 'fa-check-circle'; color = 'text-green-500'; }
+            
+            toast.className = 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 toast-slide-in pointer-events-auto min-w-[200px] shadow-soft z-50';
+            toast.innerHTML = `<i class="fas ${icon} ${color}"></i><span class="font-medium text-sm">${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('toast-slide-in');
+                toast.classList.add('toast-slide-out');
+                toast.addEventListener('animationend', () => toast.remove());
+            }, 2500);
+        }
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderOffers();
+            
+            // Theme Check
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+</body>
+</html>
