@@ -1,1 +1,0 @@
-// Hệ thống Service Worker để hỗ trợ tính năng thực hiện thông báo đẩy
