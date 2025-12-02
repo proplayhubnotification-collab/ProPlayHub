@@ -1,0 +1,76 @@
+{
+  "name": "ProPlayHub - Gaming Marketplace",
+  "short_name": "ProPlayHub",
+  "description": "Your ultimate gaming marketplace for gear, digital cards, and rentals",
+  "start_url": "/ProPlayHub/index.html",
+  "scope": "/ProPlayHub/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#ff0055",
+  "background_color": "#0f172a",
+  "screenshots": [
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=ProPlay",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "https://api.dicebear.com/7.x/avataaars/svg?seed=Gaming",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "icons": [
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=ProPlay",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "https://api.dicebear.com/7.x/avataaars/svg?seed=Gaming",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Checkout",
+      "short_name": "Checkout",
+      "description": "Go to checkout page",
+      "url": "/ProPlayHub/PHP_User/userCheckout.php",
+      "icons": [
+        {
+          "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Cart",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Store",
+      "short_name": "Store",
+      "description": "Browse our store",
+      "url": "/ProPlayHub/Templates/Users/userStore.html.php",
+      "icons": [
+        {
+          "src": "https://api.dicebear.com/7.x/shapes/svg?seed=Store",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/ProPlayHub/share",
+    "method": "POST",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}
